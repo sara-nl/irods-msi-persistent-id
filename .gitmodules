@@ -4,3 +4,4 @@
 [submodule "irods-ci-server"]
 	path = irods-ci-server
 	url = git@git.ia.surfsara.nl:data-management-services/irods-ci-server.git
+        branch = master
