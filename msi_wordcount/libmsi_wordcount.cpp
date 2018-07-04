@@ -1,21 +1,38 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <irods_version.h>
+
+#if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
+//4.1.x
 #include <apiHeaderAll.h>
 #include <msParam.h>
 #include <irods_ms_plugin.hpp>
 #include <dataObjOpen.h>
 #include <dataObjRead.h>
 #include <dataObjClose.h>
-#include "libmsi_wordcount.h"
 
 #include "reGlobalsExtern.hpp"
 #include "rsGlobalExtern.hpp"
 #include "rcGlobalExtern.h"
 
+#elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
 
+#include <apiHeaderAll.h>
+#include <msParam.h>
+#include <irods_ms_plugin.hpp>
+#include <rsDataObjOpen.hpp>
+#include <rsDataObjRead.hpp>
+#include <rsDataObjClose.hpp>
 
-//#include <reGlobalsExtern.hpp>
+#else
+
+#error "unsupported irods version"
+
+#endif
+
+#include "libmsi_wordcount.h"
+
 extern "C" {
   double get_plugin_interface_version() {
     return 1.0;
@@ -70,11 +87,13 @@ extern "C" {
 
   extern irods::ms_table_entry* plugin_factory() {
     irods::ms_table_entry* msvc = new irods::ms_table_entry(2);
-    //msvc->add_operation("msi_wordcount", std::function<int(msParam_t*,
-    //msParam_t*,
-    //ruleExecInfo_t*)>(msi_wordcount_impl));
+#if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
     msvc->add_operation("msi_wordcount", "msi_wordcount");
-
+#elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
+    msvc->add_operation("msi_wordcount", std::function<int(msParam_t*,
+                                                           msParam_t*,
+                                                           ruleExecInfo_t*)>(msi_wordcount));
+#endif
     return msvc;
   }
 }

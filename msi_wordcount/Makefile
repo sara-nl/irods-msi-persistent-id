@@ -1,28 +1,29 @@
-GCC= g++ -std=c++11
-INC=  -I/usr/include/irods/ 
-INC+= -I/app/irods-4.1.11/iRODS/server/re/include/
-INC+= -I/app/irods-4.1.11/iRODS/lib/core/include/
-INC+= -I/app/irods-4.1.11/iRODS/lib/api/include/
-INC+= -I/app/irods-4.1.11/iRODS/server/core/include/
-INC+= -I/app/irods-4.1.11/iRODS/server/icat/include/
-INC+= -I/app/irods-4.1.11/iRODS/server/drivers/include/
-INC+= -I/app/irods-4.1.11/iRODS/lib/api/include/
+IRODS_VERSION=$(shell echo -e "import json\nwith open('/var/lib/irods/VERSION.json') as f: print(str(json.load(f)['irods_version']))" | python )
 
-all: libmsi_wordcount.so  test_wordcount
+include ../irods_${IRODS_VERSION}.mk
+
+all: libmsi_wordcount.${IRODS_VERSION}.so  test_wordcount_${IRODS_VERSION}
 .PONY: all
 
-libmsi_wordcount.so: libmsi_wordcount.cpp libmsi_wordcount.h
-	${GCC} ${INC} -DRODS_SERVER -fPIC -shared -o libmsi_wordcount.so libmsi_wordcount.cpp -Wno-deprecated
+libmsi_wordcount.${IRODS_VERSION}.so: libmsi_wordcount.cpp libmsi_wordcount.h
+	${CXX} ${INC} -DRODS_SERVER ${CXX_FLAGS} -o libmsi_wordcount.${IRODS_VERSION}.so libmsi_wordcount.cpp -Wno-deprecated
 
-test_wordcount: test_wordcount.cpp libmsi_wordcount.h
-	${GCC} -I../Catch2/single_include/ test_wordcount.cpp -o test_wordcount
+test_wordcount_${IRODS_VERSION}: test_wordcount.cpp libmsi_wordcount.h
+	${CXX_TEST} ${INC_TEST} ${CXX_TEST_LIBS} test_wordcount.cpp -o test_wordcount_${IRODS_VERSION}
+
+test:
+	${CXX_TEST_PREFIX} ./test_wordcount_${IRODS_VERSION}
 
 install:
-	cp libmsi_wordcount.so /var/lib/irods/plugins/microservices/
+	cp libmsi_wordcount.${IRODS_VERSION}.so ${INSTALL_DIR}/libmsi_wordcount.so
 
 clean:
-	rm -f test_wordcount
-	rm -f libmsi_wordcount.so
+	rm -f test_wordcount_${IRODS_VERSION}
+	rm -f libmsi_wordcount.${IRODS_VERSION}.so
+
+allclean:
+	rm -f test_wordcount_*
+	rm -f libmsi_wordcount.*.so
 
 
 

@@ -3,5 +3,5 @@ myRule {
        writeLine("stdout", "*res");
 }
 
-INPUT *file="/tempZone/home/rods/libmsi_wordcount.cpp"
+INPUT *file="/tempZone/home/rods/example.txt"
 OUTPUT ruleExecOut, *name
