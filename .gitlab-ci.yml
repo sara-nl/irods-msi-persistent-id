@@ -2,23 +2,25 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 stages:
+  - setup
   - build
   - test
   - install
   - functional_test
   - package
-
-before_script:
-  - pwd
-  - ./irods-ci-server/up centos7_4_1_11 --vol .
-
-after_script:
-  - pwd
-  - ./irods-ci-server/down centos7_4_1_11
+  - shutdown
 
 ###################################
-# word_count example microservice
+# setup container
 ###################################
+centos7_4_1_11_init:
+  stage: init
+  tags:
+    - irods
+  script:
+    - pwd
+    - ./irods-ci-server/up centos7_4_1_11 --vol
+  
 centos7_4_1_11_build:
   stage: build
   tags:
@@ -53,4 +55,12 @@ centos7_4_1_11_package:
     - irods
   script:
     - docker exec centos7_4_1_11_icat_1 make -C /build/msi_wordcount package
+
+centos7_4_1_11_init:
+  stage: shutdown
+  tags:
+    - irods
+  script:
+    - pwd
+    - ./irods-ci-server/down centos7_4_1_11
 
