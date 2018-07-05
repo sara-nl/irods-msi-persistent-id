@@ -9,12 +9,10 @@ stages:
   - package
 
 before_script:
-  - echo "before"
   - pwd
   - ./irods-ci-server/up centos7_4_1_11 --vol .
 
 after_script:
-  - echo "after"
   - pwd
   - ./irods-ci-server/down centos7_4_1_11
 
