@@ -5,12 +5,14 @@ stages:
   - package
 
 before_script:
-  - pwd
   - echo "before"
+  - pwd
+  - tree
 
 after_script:
-  - pwd
   - echo "after"
+  - pwd
+  - tree
 
 ###################################
 # word_count example microservice
@@ -18,12 +20,24 @@ after_script:
 
 word_count_compile:
   stage: build
+  script:
+    - pwd
+    - tree
 
 word_count_unittest:
   stage: unittest
+  script:
+    - pwd
+    - tree
 
 word_count_test:
   stage: test
+  script:
+    - pwd
+    - tree
 
 word_count_package:
   stage: package
+  script:
+    - pwd
+    - tree
