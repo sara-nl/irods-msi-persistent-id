@@ -3,8 +3,9 @@ variables:
 
 stages:
   - build
-  - unittest
   - test
+  - install
+  - functional_test
   - package
 
 before_script:
@@ -20,35 +21,38 @@ after_script:
 ###################################
 # word_count example microservice
 ###################################
-
-word_count_compile:
+centos7_4_1_11_build:
   stage: build
   tags:
     - irods
   script:
-    - pwd
-    - tree
+    - docker exec centos7_4_1_11_icat_1 make -C /build/msi_wordcount
 
-word_count_unittest:
-  stage: unittest
-  tags:
-    - irods
-  script:
-    - pwd
-    - tree
-
-word_count_test:
+centos7_4_1_11_test:
   stage: test
   tags:
     - irods
   script:
-    - pwd
-    - tree
+    - docker exec centos7_4_1_11_icat_1 make -C /build/msi_wordcount test
 
-word_count_package:
+centos7_4_1_11_install:
+  stage: install
+  tags:
+    - irods
+  script:
+    - docker exec centos7_4_1_11_icat_1 make -C /build/msi_wordcount install
+
+centos7_4_1_11_functional_test:
+  stage: functional_test
+  tags:
+    - irods
+  script:
+    - docker exec centos7_4_1_11_icat_1 make -C /build/msi_wordcount functional_test
+
+centos7_4_1_11_package:
   stage: package
   tags:
     - irods
   script:
-    - pwd
-    - tree
+    - docker exec centos7_4_1_11_icat_1 make -C /build/msi_wordcount package
+
