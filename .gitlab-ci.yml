@@ -11,12 +11,12 @@ stages:
 before_script:
   - echo "before"
   - pwd
-  - tree
+  - ./irods-ci-server/up centos7_4_1_11 --vol .
 
 after_script:
   - echo "after"
   - pwd
-  - tree
+  - ./irods-ci-server/down centos7_4_1_11
 
 ###################################
 # word_count example microservice

@@ -17,6 +17,12 @@ test:
 install:
 	cp libmsi_wordcount.${IRODS_VERSION}.so ${INSTALL_DIR}/libmsi_wordcount.so
 
+functional_test:
+	echo "todo"
+
+package:
+	echo "todo"
+
 clean:
 	rm -f test_wordcount_${IRODS_VERSION}
 	rm -f libmsi_wordcount.${IRODS_VERSION}.so
