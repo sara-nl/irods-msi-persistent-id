@@ -20,24 +20,28 @@ after_script:
 
 word_count_compile:
   stage: build
+  tags: irods
   script:
     - pwd
     - tree
 
 word_count_unittest:
   stage: unittest
+  tags: irods
   script:
     - pwd
     - tree
 
 word_count_test:
   stage: test
+  tags: irods
   script:
     - pwd
     - tree
 
 word_count_package:
   stage: package
+  tags: irods
   script:
     - pwd
     - tree
