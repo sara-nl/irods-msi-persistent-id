@@ -1,6 +1,3 @@
-[submodule "Catch2"]
-	path = Catch2
-	url = https://github.com/catchorg/Catch2.git
 [submodule "irods-ci-server"]
 	path = irods-ci-server
 	url = git@git.ia.surfsara.nl:data-management-services/irods-ci-server.git
