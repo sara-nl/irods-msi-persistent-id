@@ -13,8 +13,8 @@ stages:
 ###################################
 # setup container
 ###################################
-centos7_4_1_11_init:
-  stage: init
+centos7_4_1_11_setup:
+  stage: setup
   tags:
     - irods
   script:
