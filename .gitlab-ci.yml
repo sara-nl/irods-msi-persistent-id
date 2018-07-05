@@ -1,0 +1,29 @@
+stages:
+  - build
+  - unittest
+  - test
+  - package
+
+before_script:
+  - pwd
+  - echo "before"
+
+after_script:
+  - pwd
+  - echo "after"
+
+###################################
+# word_count example microservice
+###################################
+
+word_count_compile:
+  stage: build
+
+word_count_unittest:
+  stage: unittest
+
+word_count_test:
+  stage: test
+
+word_count_package:
+  stage: package
