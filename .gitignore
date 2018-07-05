@@ -1,0 +1,4 @@
+*.so
+*~
+msi_wordcount/test_wordcount_4.1.11
+msi_wordcount/test_wordcount_4.2.3
