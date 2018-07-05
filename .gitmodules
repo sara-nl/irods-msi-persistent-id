@@ -2,3 +2,6 @@
 	path = irods-ci-server
 	url = git@git.ia.surfsara.nl:data-management-services/irods-ci-server.git
         branch = master
+[submodule "Catch2"]
+	path = Catch2
+	url = git@git.ia.surfsara.nl:data-management-services/catchorg.Catch2.git
