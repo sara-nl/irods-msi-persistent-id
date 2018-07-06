@@ -19,7 +19,7 @@ centos7_4_1_11_setup:
     - irods
   script:
     - pwd
-    - ./irods-ci-server/up centos7_4_1_11 --vol
+    - ./irods-ci-server/up centos7_4_1_11 --vol .
   
 centos7_4_1_11_build:
   stage: build
