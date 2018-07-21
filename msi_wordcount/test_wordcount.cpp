@@ -1,5 +1,4 @@
-#define CATCH_CONFIG_MAIN
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <string>
 #include <sstream>
 #include "libmsi_wordcount.h"

@@ -1,35 +1,21 @@
-IRODS_VERSION=$(shell echo -e "import json\nwith open('/var/lib/irods/VERSION.json') as f: print(str(json.load(f)['irods_version']))" | python )
+PREFIX=../
+include ../config.mk
 
-include ../irods_${IRODS_VERSION}.mk
 
-all: libmsi_wordcount.${IRODS_VERSION}.so  test_wordcount_${IRODS_VERSION}
+all: libmsi_wordcount${IRODS_SUFFIX}.so
 .PONY: all
 
-libmsi_wordcount.${IRODS_VERSION}.so: libmsi_wordcount.cpp libmsi_wordcount.h
-	${CXX} ${INC} -DRODS_SERVER ${CXX_FLAGS} -o libmsi_wordcount.${IRODS_VERSION}.so libmsi_wordcount.cpp -Wno-deprecated
-
-test_wordcount_${IRODS_VERSION}: test_wordcount.cpp libmsi_wordcount.h
-	${CXX_TEST} ${INC_TEST} ${CXX_TEST_LIBS} test_wordcount.cpp -o test_wordcount_${IRODS_VERSION}
-
-test:
-	${CXX_TEST_PREFIX} ./test_wordcount_${IRODS_VERSION}
+libmsi_wordcount${IRODS_SUFFIX}.so: libmsi_wordcount.cpp libmsi_wordcount.h
+	${CXX} ${INC} -DRODS_SERVER ${CXX_FLAGS} -o $@ libmsi_wordcount.cpp -Wno-deprecated
 
 install:
-	cp libmsi_wordcount.${IRODS_VERSION}.so ${INSTALL_DIR}/libmsi_wordcount.so
-
-functional_test:
-	echo "todo"
-
-package:
-	echo "todo"
+	cp libmsi_wordcount${IRODS_SUFFIX}.so ${INSTALL_DIR}/libmsi_wordcount.so
 
 clean:
-	rm -f test_wordcount_${IRODS_VERSION}
-	rm -f libmsi_wordcount.${IRODS_VERSION}.so
+	rm -f libmsi_wordcount${IRODS_SUFFIX}.so
 
 allclean:
-	rm -f test_wordcount_*
-	rm -f libmsi_wordcount.*.so
+	rm -f libmsi_wordcount*.so
 
 
 
