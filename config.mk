@@ -23,6 +23,8 @@ CXX_TEST_LIBS+= -lcurl
 CXX_TEST_LIB_DIR=
 CXX_TEST_PREFIX=
 
+CXX_MAIN_SRC= ${PREFIX}/unit_test/unit_test.cpp
+
 ifeq (${IRODS_VERSION},4.2.3)
 	CXX = /opt/irods-externals/clang3.8-0/bin/clang++ -std=c++14
 	CXX_TEST = /opt/irods-externals/clang3.8-0/bin/clang++ -std=c++14 -stdlib=libc++
@@ -57,3 +59,4 @@ else
 	CXX_TEST= g++ -std=c++11
 endif 
 
+OBJECT_DIR=${PREFIX}/obj/${IRODS_SUFFIX}
