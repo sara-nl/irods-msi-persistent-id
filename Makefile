@@ -1,10 +1,18 @@
-SUBDIRS := msi_pid \
-	   msi_wordcount \
-	   unit_test
+SUBDIRS := src
 
-all: $(SUBDIRS)
+all: src
+.PHONY: all src
 
-$(SUBDIRS):
-	$(MAKE) -C $@
+src:
+	$(MAKE) -C src
 
-.PHONY: all $(SUBDIRS)
+test:
+	$(MAKE) -C src test
+
+clean:
+	$(MAKE) -C src clean
+
+install:
+	$(MAKE) -C src install
+
+

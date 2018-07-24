@@ -1,10 +1,4 @@
 *.so
 *~
 obj
-msi_wordcount/test_wordcount_4.1.11
-msi_wordcount/test_wordcount_4.2.3
-msi_wordcount/test_wordcount
-msi_pid/test_pid_4.1.11
-msi_pid/test_pid_4.2.3
-msi_pid/test_pid
-unit_test/runtests
+lib
