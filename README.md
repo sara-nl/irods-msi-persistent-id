@@ -25,3 +25,20 @@ git submodule update --init --recursive --remote
 
 ## Compilation of microservices
 See instruction in the submodule _irdos-ci-server_.
+
+## Installation
+The continious integration process produces an RPM and updates a yum repository.
+Add the yum repository to your enviornment:
+
+
+    sudo cat > /etc/yum.repos.d/surfsara-irods.repo <<EOF
+    [surfsara-irods]
+    name=Local CentOS Repo
+    baseurl=http://145.100.58.2/CentOS/7/irods-4.1.11/
+    gpgcheck=0
+    EOF
+    
+    # check the packages
+    yum update
+    yum list available --disablerepo "*" --enablerepo surfsara-irods
+    

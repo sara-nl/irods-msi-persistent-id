@@ -29,4 +29,8 @@ else
     docker exec centos7_4_1_11_icat_1 /build/build.sh $branch $version
 fi
 
+cp RPMS/x86_64/*.rpm /repos/CentOS/7/irods-4.1.11/Packages/
+createrepo --update /repos/CentOS/7/irods-4.1.11
+
+
 

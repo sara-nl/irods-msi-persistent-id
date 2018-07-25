@@ -26,12 +26,13 @@ make %{?_smp_mflags}
 
 %install
 mkdir -p %{buildroot}/%{irods_msi_path}
+mkdir -p %{buildroot}/etc/irods
 install -m 755	%{libs_dir}/libmsi_pid_create.so %{buildroot}/%{irods_msi_path}/libmsi_pid_create.so
 install -m 755	%{libs_dir}/libmsi_pid_delete.so %{buildroot}/%{irods_msi_path}/libmsi_pid_delete.so
 install -m 755	%{libs_dir}/libmsi_pid_lookup.so %{buildroot}/%{irods_msi_path}/libmsi_pid_lookup.so
 install -m 755	%{libs_dir}/libmsi_pid_update.so %{buildroot}/%{irods_msi_path}/libmsi_pid_update.so
 install -m 755	%{libs_dir}/libmsi_pid_get.so    %{buildroot}/%{irods_msi_path}/libmsi_pid_get.so
-
+install -m 755  config.json.template %{buildroot}/etc/irods/config.json.template
 
 %files
 %{irods_msi_path}/libmsi_pid_create.so
@@ -39,6 +40,7 @@ install -m 755	%{libs_dir}/libmsi_pid_get.so    %{buildroot}/%{irods_msi_path}/l
 %{irods_msi_path}/libmsi_pid_lookup.so
 %{irods_msi_path}/libmsi_pid_update.so
 %{irods_msi_path}/libmsi_pid_get.so
+/etc/irods/config.json.template
 
 %changelog
 * Tue May 31 2016 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - 1.0-1
