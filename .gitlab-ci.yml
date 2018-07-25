@@ -6,7 +6,6 @@ stages:
   - build
   - test
   - install
-  - functional_test
   - package
   - shutdown
 
@@ -42,19 +41,12 @@ centos7_4_1_11_install:
   script:
     - docker exec centos7_4_1_11_icat_1 make -C /build/msi_wordcount install
 
-centos7_4_1_11_functional_test:
-  stage: functional_test
-  tags:
-    - irods
-  script:
-    - docker exec centos7_4_1_11_icat_1 make -C /build/msi_wordcount functional_test
-
 centos7_4_1_11_package:
   stage: package
   tags:
     - irods
   script:
-    - docker exec centos7_4_1_11_icat_1 make -C /build/msi_wordcount package
+    - irods-ci-server/rpm/build_rpm.sh 4_1_11 msi-persistent-id
 
 centos7_4_1_11_init:
   stage: shutdown
