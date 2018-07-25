@@ -22,7 +22,7 @@ Creating and managing persistent identifiers (handle) with iRods microservices.
 
 
 %build
-make %{?_smp_mflags}
+make
 
 %install
 mkdir -p %{buildroot}/%{irods_msi_path}

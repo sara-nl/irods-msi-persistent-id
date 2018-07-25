@@ -8,6 +8,11 @@ function get_tags {
     git tag --points-at HEAD | grep -e ^v | sed 's/^v//g'
 }
 
+IRODS_VERSION=4_1_11
+DIRODS_VERSION=$( echo ${IRODS_VERSION} | sed s/_/./g )
+
+irods-ci-server/up centos7_${IRODS_VERSION} --vol .
+
 if [ "$branch" == "master" ]
 then
     n_versions=$( get_tags | wc -l )
@@ -17,7 +22,7 @@ then
     elif [ "$n_versions" = 1 ]
     then
         version=$( get_tags )
-        docker exec centos7_4_1_11_icat_1 /build/build.sh "" $version
+        docker exec centos7_${IRODS_VERSION}_icat_1 /build/build.sh "" $version
     else
         echo "version tags not unique:"
         get_tags
@@ -26,11 +31,11 @@ then
 else
     # version is timestamp for develop and feature branch
     version=$( git log -1 --date=raw | awk '{ if($1=="Date:") print $2; }' )
-    docker exec centos7_4_1_11_icat_1 /build/build.sh $branch $version
+    docker exec centos7_${IRODS_VERSION}_icat_1 /build/build.sh $branch $version
 fi
 
-cp RPMS/x86_64/*.rpm /repos/CentOS/7/irods-4.1.11/Packages/
-createrepo --update /repos/CentOS/7/irods-4.1.11
+cp RPMS/x86_64/*.rpm /repos/CentOS/7/irods-${DIRODS_VERSION}/Packages/
+createrepo --update /repos/CentOS/7/irods-${DIRODS_VERSION}
 
-
+irods-ci-server/down centos7_${IRODS_VERSION}
 
