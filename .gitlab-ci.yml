@@ -25,21 +25,21 @@ centos7_4_1_11_build:
   tags:
     - irods
   script:
-    - docker exec centos7_4_1_11_icat_1 make -C /build/msi_wordcount
+    - docker exec centos7_4_1_11_icat_1 make -C /build/
 
 centos7_4_1_11_test:
   stage: test
   tags:
     - irods
   script:
-    - docker exec centos7_4_1_11_icat_1 make -C /build/msi_wordcount test
+    - docker exec centos7_4_1_11_icat_1 make -C /build/ test
 
 centos7_4_1_11_install:
   stage: install
   tags:
     - irods
   script:
-    - docker exec centos7_4_1_11_icat_1 make -C /build/msi_wordcount install
+    - docker exec centos7_4_1_11_icat_1 make -C /build/ install
 
 centos7_4_1_11_package:
   stage: package
