@@ -1,10 +1,10 @@
-Name:           msi-persistent-id%{?branch:-}%{?branch}
+Name:           %{packagename}
 Version:        %{version}
 Release:        1%{?dist}
-Summary:        Hello World example implemented in C
+Summary:        Integration of iRODS and handle system via microservices.
 
 License:        GPLv3+
-Source0:        msi-persistent-id%{?branch:-}%{?branch}-%{version}.tar.gz
+Source0:        %{packagename}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  make
