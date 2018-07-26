@@ -8,7 +8,7 @@ stages:
 ###################################
 # setup container
 ###################################
-centos7_4_1_11_setup:
+centos7_4_1_11_test:
   stage: test
   tags:
     - irods
@@ -22,15 +22,19 @@ centos7_4_1_11_setup:
     - docker exec -u $( id -u):$( id -g) centos7_4_1_11_icat_1 make -C /build/ test
     - docker exec -u $( id -u):$( id -g) centos7_4_1_11_icat_1 make -C /build/ install
     - ./irods-ci-server/down centos7_4_1_11
-centos7_4_1_11_setup:
-  stage: test
+
+centos7_4_1_11_build:
+  stage: build
   tags:
     - irods
   script:
     - pwd
     - echo $CI_COMMIT_REF_NAME
     - echo $CI_COMMIT_TAG
+    - ./irods-ci-server/down centos7_4_1_11
+    - ./irods-ci-server/up centos7_4_1_11 --vol .
     - ./irods-ci-server/rpm/build_rpm.sh 4_1_11 msi-persistent-id $CI_COMMIT_REF_NAME $CI_COMMIT_TAG
     - cp RPMS/x86_64/*.rpm /repos/CentOS/7/irods-4_1_11/Packages/
     - createrepo --update /repos/CentOS/7/irods-irods-4_1_11
+    - ./irods-ci-server/down centos7_4_1_11
 
