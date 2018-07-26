@@ -32,7 +32,7 @@ install -m 755	%{libs_dir}/libmsi_pid_delete.so %{buildroot}/%{irods_msi_path}/l
 install -m 755	%{libs_dir}/libmsi_pid_lookup.so %{buildroot}/%{irods_msi_path}/libmsi_pid_lookup.so
 install -m 755	%{libs_dir}/libmsi_pid_update.so %{buildroot}/%{irods_msi_path}/libmsi_pid_update.so
 install -m 755	%{libs_dir}/libmsi_pid_get.so    %{buildroot}/%{irods_msi_path}/libmsi_pid_get.so
-install -m 755  config.json.template %{buildroot}/etc/irods/config.json.template
+install -m 755  irods_pid.json.template %{buildroot}/etc/irods/irods_pid.json.template
 
 %files
 %{irods_msi_path}/libmsi_pid_create.so
@@ -40,7 +40,7 @@ install -m 755  config.json.template %{buildroot}/etc/irods/config.json.template
 %{irods_msi_path}/libmsi_pid_lookup.so
 %{irods_msi_path}/libmsi_pid_update.so
 %{irods_msi_path}/libmsi_pid_get.so
-/etc/irods/config.json.template
+/etc/irods/irods_pid.json.template
 
 %changelog
 * Tue May 31 2016 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - 1.0-1
