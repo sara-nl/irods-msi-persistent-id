@@ -20,7 +20,8 @@ centos7_4_1_11_test:
     - ./irods-ci-server/up centos7_4_1_11 --vol .
     - docker exec -u $( id -u):$( id -g) centos7_4_1_11_icat_1 make -C /build/
     - docker exec -u $( id -u):$( id -g) centos7_4_1_11_icat_1 make -C /build/ test
-    - docker exec -u $( id -u):$( id -g) centos7_4_1_11_icat_1 make -C /build/ install
+    - docker exec centos7_4_1_11_icat_1 make -C /build/ install
+    - echo "Todo: functional test"
     - ./irods-ci-server/down centos7_4_1_11
 
 centos7_4_1_11_build:
