@@ -1,6 +1,14 @@
 PREFIX=../
 include ../irods-ci-server/config.mk
 
+INC_TEST+= -I${PREFIX}/Catch2/single_include
+INC_TEST+= -I${PREFIX}/handle-cpp-client/include
+INC_TEST+= -I${PREFIX}/handle-cpp-client/json-parser-cpp/include
+INC_TEST+= -I${PREFIX}/handle-cpp-client/CliArgs/include
+INC+= -I${PREFIX}/handle-cpp-client/include
+INC+= -I${PREFIX}/handle-cpp-client/json-parser-cpp/include
+INC+= -I${PREFIX}/handle-cpp-client/CliArgs/include
+
 LIBS= ${LIBS_DIR}/libmsi_pid_create.so \
       ${LIBS_DIR}/libmsi_pid_delete.so \
       ${LIBS_DIR}/libmsi_pid_lookup.so \
