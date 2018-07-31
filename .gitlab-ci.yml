@@ -22,7 +22,7 @@ centos7_4_1_11_test:
     - docker exec -u $( id -u):$( id -g) centos7_4_1_11_icat_1 make -C /build/
     - docker exec -u $( id -u):$( id -g) centos7_4_1_11_icat_1 make -C /build/ test
     - docker exec centos7_4_1_11_icat_1 make -C /build/ install
-    - docker exec centos7_4_1_11_icat_1 py.test test
+    - docker exec centos7_4_1_11_icat_1 py.test /build/test
     - echo Todo_functional_test
     - ./irods-ci-server/down ./irods-ci-server/centos7_4_1_11
 
