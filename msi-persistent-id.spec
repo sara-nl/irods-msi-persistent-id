@@ -9,7 +9,7 @@ Source0:        %{packagename}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  make
 
-%define irods_msi_path /usr/lib/irods/plugins/microservices/
+%define irods_msi_path /var/lib/irods/plugins/microservices/
 %define irods_config_path /etc/irods
 %define libs_dir lib/_4.1.11
 %define debug_package %{nil}
