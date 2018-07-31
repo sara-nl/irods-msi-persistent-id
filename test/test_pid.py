@@ -74,10 +74,15 @@ class TestPidMicroServices(unittest.TestCase):
             raise Exception("handle process pid file exists: %s (pid: %s)" %
                             (PID_FILE, pid))
         else:
-            progr = os.path.abspath('../handle-cpp-client/handle-mockup/' +
-                                    'handle_mock.py')
+            progr = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                                 'handle-cpp-client',
+                                                 'handle-mockup',
+                                                 'handle_mock.py'))
             config_file, backup_file = get_config_file()
-            src_file = os.path.abspath('../handle-cpp-client/config.json.mock')
+            
+            src_file = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                                    'handle-cpp-client',
+                                                    'config.json.mock'))
             if os.path.isfile(config_file):
                 shutil.copyfile(config_file, backup_file)
             shutil.copyfile(src_file, config_file)
