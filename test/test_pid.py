@@ -134,7 +134,12 @@ class TestPidMicroServices(unittest.TestCase):
             assert exec_rule(session, "rule_move_reverse.r") is not None
             assert exec_rule(session, "rule_lookup.r") == pid
             assert (exec_rule(session, "rule_get_irods_url.r") ==
-                    "/tempZone/home/rods/example.txt")
+                    "irods://localhost/tempZone/home/rods/example.txt")
+            assert exec_rule(session, "rule_get_key.r") == ""
+            assert exec_rule(session, "rule_set_key.r") == pid
+            assert exec_rule(session, "rule_get_key.r") == "MYVALUE"
+            assert exec_rule(session, "rule_unset_key.r") == pid
+            assert exec_rule(session, "rule_get_key.r") == ""
             assert exec_rule(session, "rule_delete.r") == pid
 
     @pytest.mark.run(order=3)

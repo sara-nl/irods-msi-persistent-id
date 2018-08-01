@@ -7,21 +7,21 @@ extern "C"
     return 1.0;
   }
 
-  int msiPidGet(msParam_t* _inPathOld,
-                msParam_t* _inPathNew,
-                msParam_t* _outHandle,
-                ruleExecInfo_t* rei);
+  int msiPidUnset(msParam_t* _inPath,
+                  msParam_t* _inKey,
+                  msParam_t* _outHandle,
+                  ruleExecInfo_t* rei);
 
   irods::ms_table_entry* plugin_factory()
   {
     irods::ms_table_entry* msvc = new irods::ms_table_entry(3);
 #if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
-    msvc->add_operation("msiPidGet", "msiPidGet");
+    msvc->add_operation("msiPidUnset", "msiPidUnset");
 #elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
-    msvc->add_operation("msiPidGet", std::function<int(msParam_t*,
+    msvc->add_operation("msiPidUnset", std::function<int(msParam_t*,
                                                        msParam_t*,
                                                        msParam_t*,
-                                                       ruleExecInfo_t*)>(msiPidGet));
+                                                       ruleExecInfo_t*)>(msiPidUnset));
 #endif
     return msvc;
   }
@@ -32,9 +32,10 @@ extern "C"
 // Implemenation
 //
 ////////////////////////////////////////////////////////////////////////////////
-int msiPidGet(msParam_t* _inPath,
-              msParam_t* _inType,
-              msParam_t* _outValue, ruleExecInfo_t* rei)
+int msiPidUnset(msParam_t* _inPath,
+                msParam_t* _inKey,
+                msParam_t* _outHandle,
+                ruleExecInfo_t* rei)
 {
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;
@@ -46,7 +47,7 @@ int msiPidGet(msParam_t* _inPath,
   {
     return (USER_PARAM_TYPE_ERR);
   }
-  if (_inType == NULL || _inType->type == NULL || strcmp(_inType->type, STR_MS_T) != 0)
+  if (_inKey == NULL || _inKey->type == NULL || strcmp(_inKey->type, STR_MS_T) != 0)
   {
     return (USER_PARAM_TYPE_ERR);
   }
@@ -62,35 +63,39 @@ int msiPidGet(msParam_t* _inPath,
   }
   auto client = cfg.makeIRodsHandleClient();
   char * path = (char*)(_inPath->inOutStruct);
-  std::string inType = std::string((char*)(_inType->inOutStruct));
+  char * key = (char*)(_inKey->inOutStruct);
   try
   {
-    auto res = client->get(path);
+    auto res = client->unset(path, key);
     if(res.success)
     {
-      if(inType.empty())
+      if(res.data.isA<Object>() &&
+         res.data.as<Object>().has("handle") &&
+         res.data.as<Object>()["handle"].isA<String>())
       {
-        auto jsonString = surfsara::ast::formatJson(res.data, true);
-        fillStrInMsParam(_outValue, jsonString.c_str());
+        fillStrInMsParam(_outHandle, res.data.as<Object>()["handle"].as<String>().c_str());
+        return 0;
       }
       else
       {
-        auto result = surfsara::handle::extractValueByType(res.data, inType);
-        fillStrInMsParam(_outValue, result.c_str());
+        auto tmp = surfsara::ast::formatJson(res.data, true);
+        rodsLog(LOG_ERROR, "failed to remove index %s for iRods path: %s", key, path);
+        rodsLog(LOG_ERROR, "%s", tmp.c_str());
+        return UNMATCHED_KEY_OR_INDEX;
       }
     }
     else
     {
       std::stringstream ss;
       ss << res;
-      rodsLog(LOG_ERROR, "failed to get details of PID for iRods path from %s", path);
+      rodsLog(LOG_ERROR, "failed to remove index %s for iRods path: %s", key, path);
       rodsLog(LOG_ERROR, "%s", ss.str().c_str());
       return ACTION_FAILED_ERR;
     }
   }
   catch(std::exception & ex)
   {
-    rodsLog(LOG_ERROR, "failed to get details of PID for iRods path from %s", path);
+    rodsLog(LOG_ERROR, "failed to remove index %s for iRods path: %s", key, path);
     rodsLog(LOG_ERROR, "exception: %s", ex.what());
     return ACTION_FAILED_ERR;
   }

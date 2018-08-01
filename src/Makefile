@@ -13,7 +13,9 @@ LIBS= ${LIBS_DIR}/libmsiPidCreate.so \
       ${LIBS_DIR}/libmsiPidDelete.so \
       ${LIBS_DIR}/libmsiPidLookup.so \
       ${LIBS_DIR}/libmsiPidMove.so \
-      ${LIBS_DIR}/libmsiPidGet.so
+      ${LIBS_DIR}/libmsiPidGet.so \
+      ${LIBS_DIR}/libmsiPidSet.so \
+      ${LIBS_DIR}/libmsiPidUnset.so
 
 OBJ_TEST+= ${OBJECT_DIR}/handle-cpp-client/CliArgs/tests/test_flag.o \
 	   ${OBJECT_DIR}/handle-cpp-client/CliArgs/tests/test_multiple_value.o \
@@ -60,6 +62,8 @@ install:
 	cp ${LIBS_DIR}/libmsiPidLookup.so ${INSTALL_DIR}/libmsiPidLookup.so
 	cp ${LIBS_DIR}/libmsiPidMove.so   ${INSTALL_DIR}/libmsiPidMove.so
 	cp ${LIBS_DIR}/libmsiPidGet.so    ${INSTALL_DIR}/libmsiPidGet.so
+	cp ${LIBS_DIR}/libmsiPidSet.so    ${INSTALL_DIR}/libmsiPidSet.so
+	cp ${LIBS_DIR}/libmsiPidUnset.so  ${INSTALL_DIR}/libmsiPidUnset.so
 
 
 functional_test:

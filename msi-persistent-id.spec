@@ -32,6 +32,8 @@ install -m 755	%{libs_dir}/libmsiPidDelete.so %{buildroot}/%{irods_msi_path}/lib
 install -m 755	%{libs_dir}/libmsiPidLookup.so %{buildroot}/%{irods_msi_path}/libmsiPidLookup.so
 install -m 755	%{libs_dir}/libmsiPidMove.so %{buildroot}/%{irods_msi_path}/libmsiPidMove.so
 install -m 755	%{libs_dir}/libmsiPidGet.so    %{buildroot}/%{irods_msi_path}/libmsiPidGet.so
+install -m 755	%{libs_dir}/libmsiPidSet.so    %{buildroot}/%{irods_msi_path}/libmsiPidSet.so
+install -m 755	%{libs_dir}/libmsiPidUnset.so    %{buildroot}/%{irods_msi_path}/libmsiPidUnset.so
 install -m 755  irods_pid.json.template %{buildroot}/etc/irods/irods_pid.json.template
 
 %files
@@ -40,6 +42,8 @@ install -m 755  irods_pid.json.template %{buildroot}/etc/irods/irods_pid.json.te
 %{irods_msi_path}/libmsiPidLookup.so
 %{irods_msi_path}/libmsiPidMove.so
 %{irods_msi_path}/libmsiPidGet.so
+%{irods_msi_path}/libmsiPidSet.so
+%{irods_msi_path}/libmsiPidUnset.so
 /etc/irods/irods_pid.json.template
 
 %changelog
