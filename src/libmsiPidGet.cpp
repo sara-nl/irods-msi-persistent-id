@@ -7,7 +7,7 @@ extern "C"
     return 1.0;
   }
 
-  int msi_pid_get(msParam_t* _inPathOld,
+  int msiPidGet(msParam_t* _inPathOld,
                   msParam_t* _inPathNew,
                   msParam_t* _outHandle,
                   ruleExecInfo_t* rei);
@@ -16,12 +16,12 @@ extern "C"
   {
     irods::ms_table_entry* msvc = new irods::ms_table_entry(3);
 #if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
-    msvc->add_operation("msi_pid_get", "msi_pid_get");
+    msvc->add_operation("msiPidGet", "msiPidGet");
 #elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
-    msvc->add_operation("msi_pid_get", std::function<int(msParam_t*,
-                                                         msParam_t*,
-                                                         msParam_t*,
-                                                         ruleExecInfo_t*)>(msi_pid_update));
+    msvc->add_operation("msiPidGet", std::function<int(msParam_t*,
+                                                       msParam_t*,
+                                                       msParam_t*,
+                                                       ruleExecInfo_t*)>(msiPidGet));
 #endif
     return msvc;
   }
@@ -64,9 +64,9 @@ inline std::string extractValue(const surfsara::ast::Node & node,
   }
 }
 
-int msi_pid_get(msParam_t* _inPath,
-                msParam_t* _inType,
-                msParam_t* _outValue, ruleExecInfo_t* rei)
+int msiPidGet(msParam_t* _inPath,
+              msParam_t* _inType,
+              msParam_t* _outValue, ruleExecInfo_t* rei)
 {
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;

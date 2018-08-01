@@ -7,17 +7,17 @@ extern "C"
     return 1.0;
   }
 
-  int msi_pid_lookup(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei);
+  int msiPidLookup(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei);
 
   irods::ms_table_entry* plugin_factory()
   {
     irods::ms_table_entry* msvc = new irods::ms_table_entry(2);
 #if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
-    msvc->add_operation("msi_pid_lookup", "msi_pid_lookup");
+    msvc->add_operation("msiPidLookup", "msiPidLookup");
 #elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
-    msvc->add_operation("msi_pid_lookup", std::function<int(msParam_t*,
-                                                            msParam_t*,
-                                                            ruleExecInfo_t*)>(msi_pid_lookup));
+    msvc->add_operation("msiPidLookup", std::function<int(msParam_t*,
+                                                          msParam_t*,
+                                                          ruleExecInfo_t*)>(msiPidLookup));
 #endif
     return msvc;
   }
@@ -28,7 +28,7 @@ extern "C"
 // Implemenation
 //
 ////////////////////////////////////////////////////////////////////////////////
-int msi_pid_lookup(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei)
+int msiPidLookup(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei)
 {
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;

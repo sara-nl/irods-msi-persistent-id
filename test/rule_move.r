@@ -1,5 +1,5 @@
 myRule {
-       msi_pid_update(*pathOld, *pathNew, *handle);
+       msiPidMove(*pathOld, *pathNew, *handle);
        writeLine("stdout", "*handle");
 }
 

@@ -9,11 +9,11 @@ INC+= -I${PREFIX}/handle-cpp-client/include
 INC+= -I${PREFIX}/handle-cpp-client/json-parser-cpp/include
 INC+= -I${PREFIX}/handle-cpp-client/CliArgs/include
 
-LIBS= ${LIBS_DIR}/libmsi_pid_create.so \
-      ${LIBS_DIR}/libmsi_pid_delete.so \
-      ${LIBS_DIR}/libmsi_pid_lookup.so \
-      ${LIBS_DIR}/libmsi_pid_update.so \
-      ${LIBS_DIR}/libmsi_pid_get.so
+LIBS= ${LIBS_DIR}/libmsiPidCreate.so \
+      ${LIBS_DIR}/libmsiPidDelete.so \
+      ${LIBS_DIR}/libmsiPidLookup.so \
+      ${LIBS_DIR}/libmsiPidMove.so \
+      ${LIBS_DIR}/libmsiPidGet.so
 
 OBJ_TEST+= ${OBJECT_DIR}/handle-cpp-client/CliArgs/tests/test_flag.o \
 	   ${OBJECT_DIR}/handle-cpp-client/CliArgs/tests/test_multiple_value.o \
@@ -55,11 +55,11 @@ test: ${LIBS_DIR}/test_pid
 
 
 install:
-	cp ${LIBS_DIR}/libmsi_pid_create.so ${INSTALL_DIR}/libmsi_pid_create.so
-	cp ${LIBS_DIR}/libmsi_pid_delete.so ${INSTALL_DIR}/libmsi_pid_delete.so
-	cp ${LIBS_DIR}/libmsi_pid_lookup.so ${INSTALL_DIR}/libmsi_pid_lookup.so
-	cp ${LIBS_DIR}/libmsi_pid_update.so ${INSTALL_DIR}/libmsi_pid_update.so
-	cp ${LIBS_DIR}/libmsi_pid_get.so    ${INSTALL_DIR}/libmsi_pid_get.so
+	cp ${LIBS_DIR}/libmsiPidCreate.so ${INSTALL_DIR}/libmsiPidCreate.so
+	cp ${LIBS_DIR}/libmsiPidDelete.so ${INSTALL_DIR}/libmsiPidDelete.so
+	cp ${LIBS_DIR}/libmsiPidLookup.so ${INSTALL_DIR}/libmsiPidLookup.so
+	cp ${LIBS_DIR}/libmsiPidMove.so   ${INSTALL_DIR}/libmsiPidMove.so
+	cp ${LIBS_DIR}/libmsiPidGet.so    ${INSTALL_DIR}/libmsiPidGet.so
 
 
 functional_test:

@@ -1,5 +1,5 @@
 myRule {
-       msi_pid_create(*path, *handle);
+       msiPidCreate(*path, *handle);
        writeLine("stdout", "*handle");
 }
 

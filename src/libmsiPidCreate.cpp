@@ -1,5 +1,6 @@
 #include "libmsi_pid_common.h"
- 
+#include <sstream>
+
 extern "C"
 {
   double get_plugin_interface_version()
@@ -7,17 +8,17 @@ extern "C"
     return 1.0;
   }
 
-  int msi_pid_delete(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei);
+  int msiPidCreate(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei);
 
-  irods::ms_table_entry* plugin_factory()
+  extern irods::ms_table_entry* plugin_factory()
   {
     irods::ms_table_entry* msvc = new irods::ms_table_entry(2);
 #if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
-    msvc->add_operation("msi_pid_delete", "msi_pid_delete");
+    msvc->add_operation("msiPidCreate", "msiPidCreate");
 #elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
-    msvc->add_operation("msi_pid_delete", std::function<int(msParam_t*,
+    msvc->add_operation("msiPidCreate", std::function<int(msParam_t*,
                                                             msParam_t*,
-                                                            ruleExecInfo_t*)>(msi_pid_delete));
+                                                            ruleExecInfo_t*)>(msiPidCreate));
 #endif
     return msvc;
   }
@@ -28,8 +29,12 @@ extern "C"
 // Implemenation
 //
 ////////////////////////////////////////////////////////////////////////////////
-int msi_pid_delete(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei)
+
+int msiPidCreate(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei)
 {
+  using ReverseLookupClient = surfsara::handle::ReverseLookupClient;
+  using HandleClient = surfsara::handle::HandleClient;
+  using IRodsHandleClient = surfsara::handle::IRodsHandleClient;
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;
   if (rei == NULL || rei->rsComm == NULL)
@@ -54,7 +59,7 @@ int msi_pid_delete(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* re
   char * path = (char*)(_inPath->inOutStruct);
   try
   {
-    auto res = client->remove(path);
+    auto res = client->create(path);
     if(res.success)
     {
       if(res.data.isA<Object>() &&
@@ -67,7 +72,7 @@ int msi_pid_delete(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* re
       else
       {
         auto tmp = surfsara::ast::formatJson(res.data, true);
-        rodsLog(LOG_ERROR, "failed to delete PID for iRods path: %s", path);
+        rodsLog(LOG_ERROR, "failed to create PID for iRods path: %s", path);
         rodsLog(LOG_ERROR, "%s", tmp.c_str());
         return UNMATCHED_KEY_OR_INDEX;
       }
@@ -76,14 +81,14 @@ int msi_pid_delete(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* re
     {
       std::stringstream ss;
       ss << res;
-      rodsLog(LOG_ERROR, "failed to delete PID for iRods path: %s", path);
+      rodsLog(LOG_ERROR, "failed to create PID for iRods path: %s", path);
       rodsLog(LOG_ERROR, "%s", ss.str().c_str());
       return ACTION_FAILED_ERR;
     }
   }
   catch(std::exception & ex)
   {
-    rodsLog(LOG_ERROR, "failed to delete PID for iRods path: %s", path);
+    rodsLog(LOG_ERROR, "failed to create PID for iRods path: %s", path);
     rodsLog(LOG_ERROR, "exception: %s", ex.what());
     return ACTION_FAILED_ERR;
   }

@@ -129,9 +129,9 @@ class TestPidMicroServices(unittest.TestCase):
             pid = exec_rule(session, "rule_create.r")
             assert re.match(re.escape(PREFIX) + "/.+", pid)
             assert exec_rule(session, "rule_lookup.r") == pid
-            assert exec_rule(session, "rule_update.r") is not None
+            assert exec_rule(session, "rule_move.r") is not None
             assert exec_rule(session, "rule_lookup.r") == ""
-            assert exec_rule(session, "rule_update_reverse.r") is not None
+            assert exec_rule(session, "rule_move_reverse.r") is not None
             assert exec_rule(session, "rule_lookup.r") == pid
             assert (exec_rule(session, "rule_get_irods_url.r") ==
                     "/tempZone/home/rods/example.txt")
