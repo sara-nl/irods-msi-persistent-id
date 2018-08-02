@@ -1,7 +1,7 @@
 SUBDIRS := src
 
 all: src
-.PHONY: all src
+.PHONY: all src test clean install
 
 src:
 	$(MAKE) -C src
