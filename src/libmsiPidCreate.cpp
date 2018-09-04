@@ -1,3 +1,20 @@
+/*****************************************************************
+Copyright 2018, SURFsara
+Author Stefan Wolfsheimer
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+********************************************************************/
 #include "libmsi_pid_common.h"
 #include <sstream>
 
@@ -8,17 +25,17 @@ extern "C"
     return 1.0;
   }
 
-  int msi_pid_create(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei);
+  int msiPidCreate(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei);
 
   extern irods::ms_table_entry* plugin_factory()
   {
     irods::ms_table_entry* msvc = new irods::ms_table_entry(2);
 #if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
-    msvc->add_operation("msi_pid_create", "msi_pid_create");
+    msvc->add_operation("msiPidCreate", "msiPidCreate");
 #elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
-    msvc->add_operation("msi_pid_create", std::function<int(msParam_t*,
+    msvc->add_operation("msiPidCreate", std::function<int(msParam_t*,
                                                             msParam_t*,
-                                                            ruleExecInfo_t*)>(msi_pid_create));
+                                                            ruleExecInfo_t*)>(msiPidCreate));
 #endif
     return msvc;
   }
@@ -30,7 +47,7 @@ extern "C"
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-int msi_pid_create(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei)
+int msiPidCreate(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei)
 {
   using ReverseLookupClient = surfsara::handle::ReverseLookupClient;
   using HandleClient = surfsara::handle::HandleClient;

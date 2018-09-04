@@ -1,3 +1,20 @@
+/*****************************************************************
+Copyright 2018, SURFsara
+Author Stefan Wolfsheimer
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+********************************************************************/
 #include "libmsi_pid_common.h"
  
 extern "C"
@@ -7,21 +24,17 @@ extern "C"
     return 1.0;
   }
 
-  int msi_pid_update(msParam_t* _inPathOld,
-                     msParam_t* _inPathNew,
-                     msParam_t* _outHandle,
-                     ruleExecInfo_t* rei);
+  int msiPidDelete(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei);
 
   irods::ms_table_entry* plugin_factory()
   {
-    irods::ms_table_entry* msvc = new irods::ms_table_entry(3);
+    irods::ms_table_entry* msvc = new irods::ms_table_entry(2);
 #if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
-    msvc->add_operation("msi_pid_update", "msi_pid_update");
+    msvc->add_operation("msiPidDelete", "msiPidDelete");
 #elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
-    msvc->add_operation("msi_pid_update", std::function<int(msParam_t*,
-                                                            msParam_t*,
-                                                            msParam_t*,
-                                                            ruleExecInfo_t*)>(msi_pid_update));
+    msvc->add_operation("msiPidDelete", std::function<int(msParam_t*,
+                                                          msParam_t*,
+                                                          ruleExecInfo_t*)>(msiPidDelete));
 #endif
     return msvc;
   }
@@ -32,9 +45,7 @@ extern "C"
 // Implemenation
 //
 ////////////////////////////////////////////////////////////////////////////////
-int msi_pid_update(msParam_t* _inPathOld,
-                   msParam_t* _inPathNew,
-                   msParam_t* _outHandle, ruleExecInfo_t* rei)
+int msiPidDelete(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei)
 {
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;
@@ -42,11 +53,7 @@ int msi_pid_update(msParam_t* _inPathOld,
   {
     return (SYS_INTERNAL_NULL_INPUT_ERR);
   }
-  if (_inPathOld == NULL || _inPathOld->type == NULL || strcmp(_inPathOld->type, STR_MS_T) != 0)
-  {
-    return (USER_PARAM_TYPE_ERR);
-  }
-  if (_inPathNew == NULL || _inPathNew->type == NULL || strcmp(_inPathNew->type, STR_MS_T) != 0)
+  if (_inPath == NULL || _inPath->type == NULL || strcmp(_inPath->type, STR_MS_T) != 0)
   {
     return (USER_PARAM_TYPE_ERR);
   }
@@ -61,11 +68,10 @@ int msi_pid_update(msParam_t* _inPathOld,
     return FILE_READ_ERR;
   }
   auto client = cfg.makeIRodsHandleClient();
-  char * pathOld = (char*)(_inPathOld->inOutStruct);
-  char * pathNew = (char*)(_inPathNew->inOutStruct);
+  char * path = (char*)(_inPath->inOutStruct);
   try
   {
-    auto res = client->update(pathOld, pathNew);
+    auto res = client->remove(path);
     if(res.success)
     {
       if(res.data.isA<Object>() &&
@@ -78,7 +84,7 @@ int msi_pid_update(msParam_t* _inPathOld,
       else
       {
         auto tmp = surfsara::ast::formatJson(res.data, true);
-        rodsLog(LOG_ERROR, "failed to update PID for iRods path from %s to %s", pathOld, pathNew);
+        rodsLog(LOG_ERROR, "failed to delete PID for iRods path: %s", path);
         rodsLog(LOG_ERROR, "%s", tmp.c_str());
         return UNMATCHED_KEY_OR_INDEX;
       }
@@ -87,14 +93,14 @@ int msi_pid_update(msParam_t* _inPathOld,
     {
       std::stringstream ss;
       ss << res;
-      rodsLog(LOG_ERROR, "failed to update PID for iRods path from %s to %s", pathOld, pathNew);
+      rodsLog(LOG_ERROR, "failed to delete PID for iRods path: %s", path);
       rodsLog(LOG_ERROR, "%s", ss.str().c_str());
       return ACTION_FAILED_ERR;
     }
   }
   catch(std::exception & ex)
   {
-    rodsLog(LOG_ERROR, "failed to update PID for iRods path from %s to %s", pathOld, pathNew);
+    rodsLog(LOG_ERROR, "failed to delete PID for iRods path: %s", path);
     rodsLog(LOG_ERROR, "exception: %s", ex.what());
     return ACTION_FAILED_ERR;
   }

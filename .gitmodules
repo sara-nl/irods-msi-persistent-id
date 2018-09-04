@@ -7,4 +7,4 @@
 	url = ../catchorg.Catch2.git
 [submodule "handle-cpp-client"]
 	path = handle-cpp-client
-	url = git@git.ia.surfsara.nl:data-management-services/handle-cpp-client.git
+	url = ../handle-cpp-client.git

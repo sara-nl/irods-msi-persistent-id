@@ -1,16 +1,15 @@
-Name:           msi-persistent-id%{?branch:-%{branch}}
-Version:        1.0
+Name:           %{packagename}
+Version:        %{version}
 Release:        1%{?dist}
-Summary:        Hello World example implemented in C
+Summary:        Integration of iRODS and handle system via microservices.
 
 License:        GPLv3+
-URL:            https://www.example.com/%{name}
-Source0:        https://www.example.com/%{name}/releases/%{name}-%{version}.tar.gz
+Source0:        %{packagename}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  make
 
-%define irods_msi_path /usr/lib/irods/plugins/microservices/
+%define irods_msi_path /var/lib/irods/plugins/microservices/
 %define irods_config_path /etc/irods
 %define libs_dir lib/_4.1.11
 %define debug_package %{nil}
@@ -23,24 +22,30 @@ Creating and managing persistent identifiers (handle) with iRods microservices.
 
 
 %build
-make %{?_smp_mflags}
+make
 
 %install
 mkdir -p %{buildroot}/%{irods_msi_path}
-install -m 755	%{libs_dir}/libmsi_pid_create.so %{buildroot}/%{irods_msi_path}/libmsi_pid_create.so
-install -m 755	%{libs_dir}/libmsi_pid_delete.so %{buildroot}/%{irods_msi_path}/libmsi_pid_delete.so
-install -m 755	%{libs_dir}/libmsi_pid_lookup.so %{buildroot}/%{irods_msi_path}/libmsi_pid_lookup.so
-install -m 755	%{libs_dir}/libmsi_pid_update.so %{buildroot}/%{irods_msi_path}/libmsi_pid_update.so
-install -m 755	%{libs_dir}/libmsi_pid_get.so    %{buildroot}/%{irods_msi_path}/libmsi_pid_get.so
-
+mkdir -p %{buildroot}/etc/irods
+install -m 755	%{libs_dir}/libmsiPidCreate.so %{buildroot}/%{irods_msi_path}/libmsiPidCreate.so
+install -m 755	%{libs_dir}/libmsiPidDelete.so %{buildroot}/%{irods_msi_path}/libmsiPidDelete.so
+install -m 755	%{libs_dir}/libmsiPidLookup.so %{buildroot}/%{irods_msi_path}/libmsiPidLookup.so
+install -m 755	%{libs_dir}/libmsiPidMove.so %{buildroot}/%{irods_msi_path}/libmsiPidMove.so
+install -m 755	%{libs_dir}/libmsiPidGet.so    %{buildroot}/%{irods_msi_path}/libmsiPidGet.so
+install -m 755	%{libs_dir}/libmsiPidSet.so    %{buildroot}/%{irods_msi_path}/libmsiPidSet.so
+install -m 755	%{libs_dir}/libmsiPidUnset.so    %{buildroot}/%{irods_msi_path}/libmsiPidUnset.so
+install -m 755  irods_pid.json.template %{buildroot}/etc/irods/irods_pid.json.template
 
 %files
-%{irods_msi_path}/libmsi_pid_create.so
-%{irods_msi_path}/libmsi_pid_delete.so
-%{irods_msi_path}/libmsi_pid_lookup.so
-%{irods_msi_path}/libmsi_pid_update.so
-%{irods_msi_path}/libmsi_pid_get.so
+%{irods_msi_path}/libmsiPidCreate.so
+%{irods_msi_path}/libmsiPidDelete.so
+%{irods_msi_path}/libmsiPidLookup.so
+%{irods_msi_path}/libmsiPidMove.so
+%{irods_msi_path}/libmsiPidGet.so
+%{irods_msi_path}/libmsiPidSet.so
+%{irods_msi_path}/libmsiPidUnset.so
+/etc/irods/irods_pid.json.template
 
 %changelog
-* Tue May 31 2016 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - 1.0-1
-- Todo
+* Wed Aug 01 2018 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - develop
+- initial development branch

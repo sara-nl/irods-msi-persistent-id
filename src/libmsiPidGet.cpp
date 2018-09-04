@@ -1,3 +1,20 @@
+/*****************************************************************
+Copyright 2018, SURFsara
+Author Stefan Wolfsheimer
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+********************************************************************/
 #include "libmsi_pid_common.h"
  
 extern "C"
@@ -7,21 +24,21 @@ extern "C"
     return 1.0;
   }
 
-  int msi_pid_get(msParam_t* _inPathOld,
-                  msParam_t* _inPathNew,
-                  msParam_t* _outHandle,
-                  ruleExecInfo_t* rei);
+  int msiPidGet(msParam_t* _inPathOld,
+                msParam_t* _inPathNew,
+                msParam_t* _outHandle,
+                ruleExecInfo_t* rei);
 
   irods::ms_table_entry* plugin_factory()
   {
     irods::ms_table_entry* msvc = new irods::ms_table_entry(3);
 #if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
-    msvc->add_operation("msi_pid_get", "msi_pid_get");
+    msvc->add_operation("msiPidGet", "msiPidGet");
 #elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
-    msvc->add_operation("msi_pid_get", std::function<int(msParam_t*,
-                                                         msParam_t*,
-                                                         msParam_t*,
-                                                         ruleExecInfo_t*)>(msi_pid_update));
+    msvc->add_operation("msiPidGet", std::function<int(msParam_t*,
+                                                       msParam_t*,
+                                                       msParam_t*,
+                                                       ruleExecInfo_t*)>(msiPidGet));
 #endif
     return msvc;
   }
@@ -32,41 +49,9 @@ extern "C"
 // Implemenation
 //
 ////////////////////////////////////////////////////////////////////////////////
-inline std::string extractValue(const surfsara::ast::Node & node,
-                                const std::string & type)
-{
-  using String = surfsara::ast::String;
-  using Node = surfsara::ast::Node;
-  auto obj = node.find("values/*/data/value", [type](const Node & root,
-                                                     const std::vector<std::string> & _path)
-                       {
-                         std::vector<std::string> path(_path);
-                         path.pop_back();
-                         path.pop_back();
-                         path.push_back("type");
-                         auto n = root.find(path);
-                         if(n.isA<String>() && n.as<String>() == type)
-                         {
-                           return true;
-                         }
-                         else
-                         {
-                           return false;
-                         }
-                       });
-  if(obj.isA<String>())
-  {
-    return obj.as<String>();
-  }
-  else
-  {
-    return "[OBJECT]";
-  }
-}
-
-int msi_pid_get(msParam_t* _inPath,
-                msParam_t* _inType,
-                msParam_t* _outValue, ruleExecInfo_t* rei)
+int msiPidGet(msParam_t* _inPath,
+              msParam_t* _inType,
+              msParam_t* _outValue, ruleExecInfo_t* rei)
 {
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;
@@ -107,7 +92,7 @@ int msi_pid_get(msParam_t* _inPath,
       }
       else
       {
-        auto result = extractValue(res.data, inType);
+        auto result = surfsara::handle::extractValueByType(res.data, inType);
         fillStrInMsParam(_outValue, result.c_str());
       }
     }

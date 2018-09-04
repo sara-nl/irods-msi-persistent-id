@@ -1,4 +1,7 @@
 *.so
 *~
+.pytest_cache
 obj
 lib
+RPMS
+__pycache__
