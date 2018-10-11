@@ -42,7 +42,7 @@ ${LIBS}:
 	mkdir -p $(dir $@)
 	mkdir -p $(dir $(patsubst ${LIBS_DIR}/%.so,${OBJECT_DIR}/%.dep, $@))
 	${CXX} ${INC} -DRODS_SERVER ${CXX_FLAGS} -o $@ $(patsubst ${LIBS_DIR}/%.so, %.cpp, $@) -lcurl
-	${CXX} ${INC} -MM -MT $@ -MF $(patsubst ${LIBS_DIR}/%.so,${LIBS_DIR}/%.dep, $@) -DRODS_SERVER \
+	${CXX} ${INC} -MM -MT $@ -MF $(patsubst ${LIBS_DIR}/%.so,${OBJECT_DIR}/%.dep, $@) -DRODS_SERVER \
 	${CXX_FLAGS} $(patsubst ${LIBS_DIR}/%.so, %.cpp, $@)
 
 ${LIBS_DIR}/test_pid: ${OBJ_TEST}
