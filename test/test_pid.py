@@ -1,4 +1,4 @@
-################################################################################
+##############################################################################
 # Copyright 2018, SURFsara
 # Author Stefan Wolfsheimer
 #
@@ -6,7 +6,7 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
@@ -14,7 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-################################################################################
+##############################################################################
 import pytest
 import unittest
 import os
@@ -51,14 +51,17 @@ def get_session():
                         zone='tempZone')
 
 
-def get_rule(session, rule_file):
+def get_rule(session, rule_file, **kwargs):
+    params = {"*" + k: '"{0}"'.format(v.replace('"', '\\"'))
+              for k, v in kwargs.items()}
     rule_path = os.path.join(os.path.dirname(__file__), rule_file)
     return Rule(session,
-                rule_file=rule_path)
+                rule_file=rule_path,
+                params=params)
 
 
-def exec_rule(session, rule_file):
-    rule = get_rule(session, rule_file)
+def exec_rule(session, rule_file, **kwargs):
+    rule = get_rule(session, rule_file, **kwargs)
     res = rule.execute()
     return get_return_value(res, 0)
 
@@ -91,13 +94,14 @@ class TestPidMicroServices(unittest.TestCase):
             raise Exception("handle process pid file exists: %s (pid: %s)" %
                             (PID_FILE, pid))
         else:
-            progr = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)),
+            curr_dir = os.path.dirname(os.path.dirname(__file__))
+            progr = os.path.abspath(os.path.join(curr_dir,
                                                  'handle-cpp-client',
                                                  'handle-mockup',
                                                  'handle_mock.py'))
             config_file, backup_file = get_config_file()
-            
-            src_file = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)),
+
+            src_file = os.path.abspath(os.path.join(curr_dir,
                                                     'handle-cpp-client',
                                                     'config.json.mock'))
             if os.path.isfile(config_file):
@@ -154,7 +158,11 @@ class TestPidMicroServices(unittest.TestCase):
                     "irods://localhost/tempZone/home/rods/example.txt")
             assert exec_rule(session, "rule_get_key.r") == ""
             assert exec_rule(session, "rule_set_key.r") == pid
-            assert exec_rule(session, "rule_get_key.r") == "MYVALUE"
+            assert exec_rule(session, "rule_get_key.r",
+                             key="MYKEY") == "MYVALUE"
+            assert exec_rule(session, "rule_set_multi_key.r") == pid
+            assert exec_rule(session, "rule_get_key.r",
+                             key="MYKEY") == "MYVALUE_2"
             assert exec_rule(session, "rule_unset_key.r") == pid
             assert exec_rule(session, "rule_get_key.r") == ""
             assert exec_rule(session, "rule_delete.r") == pid
