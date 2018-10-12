@@ -25,17 +25,20 @@ extern "C"
     return 1.0;
   }
 
-  int msiPidCreate(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei);
+  int msiPidCreate(msParam_t* _inPath,
+                   msParam_t* _keyValues,
+                   msParam_t* _outHandle, ruleExecInfo_t* rei);
 
   extern irods::ms_table_entry* plugin_factory()
   {
-    irods::ms_table_entry* msvc = new irods::ms_table_entry(2);
+    irods::ms_table_entry* msvc = new irods::ms_table_entry(3);
 #if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
     msvc->add_operation("msiPidCreate", "msiPidCreate");
 #elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
     msvc->add_operation("msiPidCreate", std::function<int(msParam_t*,
-                                                            msParam_t*,
-                                                            ruleExecInfo_t*)>(msiPidCreate));
+                                                          msParam_t*,
+                                                          msParam_t*,
+                                                          ruleExecInfo_t*)>(msiPidCreate));
 #endif
     return msvc;
   }
@@ -47,13 +50,19 @@ extern "C"
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-int msiPidCreate(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei)
+int msiPidCreate(msParam_t* _inPath,
+                 msParam_t* _keyValues,
+                 msParam_t* _outHandle, ruleExecInfo_t* rei)
 {
   using ReverseLookupClient = surfsara::handle::ReverseLookupClient;
   using HandleClient = surfsara::handle::HandleClient;
   using IRodsHandleClient = surfsara::handle::IRodsHandleClient;
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;
+  std::vector<std::pair<std::string, std::string>> keyValuePairs;
+
+  rodsLog(LOG_ERROR, "_keyValues:%s\n", _keyValues->type);
+  
   if (rei == NULL || rei->rsComm == NULL)
   {
     return (SYS_INTERNAL_NULL_INPUT_ERR);
@@ -61,6 +70,23 @@ int msiPidCreate(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei)
   if (_inPath == NULL || _inPath->type == NULL || strcmp(_inPath->type, STR_MS_T) != 0)
   {
     return (USER_PARAM_TYPE_ERR);
+  }
+  if (_keyValues != NULL && _keyValues->type != NULL && strcmp(_keyValues->type, StrArray_MS_T) == 0)
+  {
+    strArray_t * strArr = (strArray_t *) _keyValues->inOutStruct;
+    if(strArr->len % 2 != 0)
+    {
+      throw std::logic_error("input array must not be empty or "
+                             "contain uneven number of elements");
+    }
+    const char *val = strArr->value;
+    int i = 0;
+    while(i < strArr->len)
+    {
+      keyValuePairs.push_back(std::make_pair(std::string(&val[i * strArr->size]),
+                                             std::string(&val[(i + 1) * strArr->size])));
+      i += 2;
+    }
   }
   surfsara::handle::Config cfg;
   try
@@ -76,7 +102,7 @@ int msiPidCreate(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei)
   char * path = (char*)(_inPath->inOutStruct);
   try
   {
-    auto res = client->create(path);
+    auto res = client->create(path, keyValuePairs);
     if(res.success)
     {
       if(res.data.isA<Object>() &&

@@ -83,7 +83,7 @@ int msiPidUnset(msParam_t* _inPath,
   char * key = (char*)(_inKey->inOutStruct);
   try
   {
-    auto res = client->unset(path, key);
+    auto res = client->unset(path, {key});
     if(res.success)
     {
       if(res.data.isA<Object>() &&
