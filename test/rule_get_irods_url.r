@@ -4,5 +4,5 @@ myRule {
 }
 
 INPUT *path="/tempZone/home/rods/example.txt"
-INPUT *jsonPath="IRODS_URL"
+INPUT *jsonPath="IRODS/URL"
 OUTPUT ruleExecOut
