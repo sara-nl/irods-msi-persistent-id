@@ -42,3 +42,5 @@ Add the yum repository to your enviornment:
     yum update
     yum list available --disablerepo "*" --enablerepo surfsara-irods
     
+    # install the services
+    yum install msi-persistent-id-master.x86_64
