@@ -47,8 +47,8 @@ Add the yum repository to your enviornment:
 
 ## Configuration
 
-cd /etc/irods/
-cp irods_pid.json.template irods_pid.json
-vi irods_pid.json
+    cd /etc/irods/
+    cp irods_pid.json.template irods_pid.json
+    vi irods_pid.json
 
 To test the microervices check the rule files in the test directory.
