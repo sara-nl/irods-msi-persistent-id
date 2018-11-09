@@ -42,3 +42,13 @@ Add the yum repository to your enviornment:
     yum update
     yum list available --disablerepo "*" --enablerepo surfsara-irods
     
+    # install the services
+    yum install msi-persistent-id-master.x86_64
+
+## Configuration
+
+    cd /etc/irods/
+    cp irods_pid.json.template irods_pid.json
+    vi irods_pid.json
+
+To test the microervices check the rule files in the test directory.
