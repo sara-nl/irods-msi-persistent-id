@@ -61,8 +61,7 @@ int msiPidCreate(msParam_t* _inPath,
   using String = surfsara::ast::String;
   std::vector<std::pair<std::string, std::string>> keyValuePairs;
 
-  rodsLog(LOG_ERROR, "_keyValues:%s\n", _keyValues->type);
-  
+ 
   if (rei == NULL || rei->rsComm == NULL)
   {
     return (SYS_INTERNAL_NULL_INPUT_ERR);

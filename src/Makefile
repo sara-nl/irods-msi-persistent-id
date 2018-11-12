@@ -52,7 +52,7 @@ ${LIBS_DIR}/test_pid: ${OBJ_TEST}
 
 test: ${LIBS_DIR}/test_pid
 	mkdir -p ${LIBS_DIR}
-	${LIBS_DIR}/test_pid
+	${CXX_TEST_PREFIX} ${LIBS_DIR}/test_pid
 .PONY: test
 
 

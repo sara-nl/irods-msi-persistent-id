@@ -41,6 +41,7 @@ extern "C"
     msvc->add_operation("msiPidSet", std::function<int(msParam_t*,
                                                        msParam_t*,
                                                        msParam_t*,
+                                                       msParam_t*,
                                                        ruleExecInfo_t*)>(msiPidSet));
 #endif
     return msvc;

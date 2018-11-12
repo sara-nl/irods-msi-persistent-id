@@ -95,6 +95,7 @@ int msiPidGet(msParam_t* _inPath,
         auto result = surfsara::handle::extractValueByType(res.data, inType);
         fillStrInMsParam(_outValue, result.c_str());
       }
+      return 0;
     }
     else
     {
