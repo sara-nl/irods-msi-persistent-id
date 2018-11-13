@@ -49,6 +49,31 @@ install -m 755  irods_pid.json.template %{buildroot}/etc/irods/irods_pid.json.te
 %{irods_msi_path}/libmsiPidUnset.so
 /etc/irods/irods_pid.json.template
 
+%post
+if [ -e /etc/irods/service_account.config ]
+then
+    source /etc/irods/service_account.config
+    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidCreate.so
+    chmod 644 %{irods_msi_path}/libmsiPidCreate.so
+    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidDelete.so
+    chmod 644 %{irods_msi_path}/libmsiPidDelete.so
+    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidLookup.so
+    chmod 644 %{irods_msi_path}/libmsiPidLookup.so
+    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidMove.so
+    chmod 644 %{irods_msi_path}/libmsiPidMove.so
+    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidGet.so
+    chmod 644 %{irods_msi_path}/libmsiPidGet.so
+    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidSet.so
+    chmod 644 %{irods_msi_path}/libmsiPidSet.so
+    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidUnset.so
+    chmod 644 %{irods_msi_path}/libmsiPidUnset.so
+    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME /etc/irods/irods_pid.json.template
+    chmod 644 /etc/irods/irods_pid.json.template
+fi
+
 %changelog
+* Tue Nov 13 2018 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - develop
+- add support for iRODS 4.2.3
+
 * Wed Aug 01 2018 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - develop
 - initial development branch
