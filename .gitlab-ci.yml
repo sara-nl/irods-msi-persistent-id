@@ -2,6 +2,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 stages:
+  - build_containers
   - test
   - build
 
@@ -19,34 +20,87 @@ after_script:
 ###################################
 # setup container
 ###################################
+centos7_4_1_11_container:
+  stage: build_containers
+  tags:
+    - irods
+  script:
+    - docker-compose -f irods-ci-server/centos7_4_1_11/docker-compose.yml build
+
+centos7_4_2_3_container:
+  stage: build_containers
+  tags:
+    - irods
+  script:
+    - docker-compose -f irods-ci-server/centos7_4_2_3/docker-compose.yml build
+
+###################################
+# test 
+###################################
 centos7_4_1_11_test:
   stage: test
   tags:
     - irods
+  variables:
+    IRODS_VERSION: '4_1_11'
   script:
     - pwd
     - echo $CI_COMMIT_REF_NAME
     - echo $CI_COMMIT_TAG
-    - docker-compose -f irods-ci-server/centos7_4_1_11/docker-compose.yml build
-    - ./irods-ci-server/down ./irods-ci-server/centos7_4_1_11
-    - ./irods-ci-server/up ./irods-ci-server/centos7_4_1_11 --vol .
-    - docker exec -u $( id -u):$( id -g) centos7_4_1_11_icat_1 make -C /build/
-    - docker exec -u $( id -u):$( id -g) centos7_4_1_11_icat_1 make -C /build/ test
-    - docker exec centos7_4_1_11_icat_1 make -C /build/ install
-    - ./irods-ci-server/run_py_test.sh centos7_4_1_11_icat_1 /build/test
-    - ./irods-ci-server/down ./irods-ci-server/centos7_4_1_11
+    - ./irods-ci-server/up ./irods-ci-server/centos7_$IRODS_VERSION --vol .
+    - docker exec -u $( id -u):$( id -g) centos7_${IRODS_VERSION}_icat_1 make -C /build/
+    - docker exec -u $( id -u):$( id -g) centos7_${IRODS_VERSION}_icat_1 make -C /build/ test
+    - docker exec centos7_${IRODS_VERSION}_icat_1 make -C /build/ install
+    - ./irods-ci-server/run_py_test.sh centos7_${IRODS_VERSION}_icat_1 /build/test
 
+centos7_4_2_3_test:
+  stage: test
+  tags:
+    - irods
+  variables:
+    IRODS_VERSION: '4_2_3'
+  script:
+    - pwd
+    - echo $CI_COMMIT_REF_NAME
+    - echo $CI_COMMIT_TAG
+    - ./irods-ci-server/up ./irods-ci-server/centos7_$IRODS_VERSION --vol .
+    - docker exec -u $( id -u):$( id -g) centos7_${IRODS_VERSION}_icat_1 make -C /build/
+    - docker exec -u $( id -u):$( id -g) centos7_${IRODS_VERSION}_icat_1 make -C /build/ test
+    - docker exec centos7_${IRODS_VERSION}_icat_1 make -C /build/ install
+    - ./irods-ci-server/run_py_test.sh centos7_${IRODS_VERSION}_icat_1 /build/test
+
+###################################
+# build
+###################################
 centos7_4_1_11_build:
   stage: build
   tags:
     - irods
+  variables:
+    IRODS_VERSION: '4_1_11'
+    IRODS_REPO_VERSION: '4.1.11'
   script:
     - pwd
     - echo $CI_COMMIT_REF_NAME
     - echo $CI_COMMIT_TAG
-    - ./irods-ci-server/down ./irods-ci-server/centos7_4_1_11
-    - ./irods-ci-server/up ./irods-ci-server/centos7_4_1_11 --vol .
-    - ./irods-ci-server/rpm/build_rpm.sh 4_1_11 msi-persistent-id $CI_COMMIT_REF_NAME $CI_COMMIT_TAG
-    - cp RPMS/4_1_11/x86_64/*.rpm /repos/CentOS/7/irods-4.1.11/Packages/
-    - createrepo --update /repos/CentOS/7/irods-4.1.11
-    - ./irods-ci-server/down ./irods-ci-server/centos7_4_1_11
+    - ./irods-ci-server/up ./irods-ci-server/centos7_${IRODS_VERSION} --vol .
+    - ./irods-ci-server/rpm/build_rpm.sh ${IRODS_VERSION} msi-persistent-id $CI_COMMIT_REF_NAME $CI_COMMIT_TAG
+    - cp RPMS/4_1_11/x86_64/*.rpm /repos/CentOS/7/irods-${IRODS_REPO_VERSION}/Packages/
+    - createrepo --update /repos/CentOS/7/irods-${IRODS_REPO_VERSION}
+
+centos7_4_2_3_build:
+  stage: build
+  tags:
+    - irods
+  variables:
+    IRODS_VERSION: '4_2_3'
+    IRODS_REPO_VERSION: '4.2.3'
+  script:
+    - pwd
+    - echo $CI_COMMIT_REF_NAME
+    - echo $CI_COMMIT_TAG
+    - ./irods-ci-server/up ./irods-ci-server/centos7_${IRODS_VERSION} --vol .
+    - ./irods-ci-server/rpm/build_rpm.sh ${IRODS_VERSION} msi-persistent-id $CI_COMMIT_REF_NAME $CI_COMMIT_TAG
+    - cp RPMS/4_1_11/x86_64/*.rpm /repos/CentOS/7/irods-${IRODS_REPO_VERSION}/Packages/
+    - createrepo --update /repos/CentOS/7/irods-${IRODS_REPO_VERSION}
+
