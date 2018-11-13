@@ -64,6 +64,7 @@ centos7_4_2_3_test:
     - echo $CI_COMMIT_REF_NAME
     - echo $CI_COMMIT_TAG
     - ./irods-ci-server/up ./irods-ci-server/centos7_$IRODS_VERSION --vol .
+    - docker exec centos7_${IRODS_VERSION}_icat_1 chmod a+r /var/lib/irods/VERSION.json
     - docker exec -u $( id -u):$( id -g) centos7_${IRODS_VERSION}_icat_1 make -C /build/
     - docker exec -u $( id -u):$( id -g) centos7_${IRODS_VERSION}_icat_1 make -C /build/ test
     - docker exec centos7_${IRODS_VERSION}_icat_1 make -C /build/ install
