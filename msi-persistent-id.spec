@@ -53,7 +53,6 @@ install -m 755  irods_pid.json.template %{buildroot}/etc/irods/irods_pid.json.te
 if [ -e /etc/irods/service_account.config ]
 then
     source /etc/irods/service_account.config
-    echo $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME
     chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidCreate.so
     chmod 644 %{irods_msi_path}/libmsiPidCreate.so
     chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidDelete.so
