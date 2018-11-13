@@ -2,12 +2,27 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 stages:
+  - cleanup
   - test
+  - cleanup
   - build
+  - cleanup
 
 ###################################
 # setup container
 ###################################
+remove_containers:
+  stage: cleanup
+  tags:
+    - irods
+  script:
+    - echo "-------------------------------"
+    - echo "cleanup"
+    - echo "-------------------------------"
+    - ./irods-ci-server/down ./irods-ci-server/centos7_4_1_11
+    - ./irods-ci-server/down ./irods-ci-server/centos7_4_2_3
+    
+
 centos7_4_1_11_test:
   stage: test
   tags:
