@@ -154,6 +154,7 @@ class TestPidMicroServices(unittest.TestCase):
             assert exec_rule(session, "rule_lookup.r") == ""
             assert exec_rule(session, "rule_move_reverse.r") is not None
             assert exec_rule(session, "rule_lookup.r") == pid
+            assert exec_rule(session, "rule_lookup_key.r") == pid
             assert (exec_rule(session, "rule_get_irods_url.r") ==
                     "irods://localhost/tempZone/home/rods/example.txt")
             assert exec_rule(session, "rule_get_key.r") == ""

@@ -38,6 +38,7 @@ mkdir -p %{buildroot}/etc/irods
 install -m 755	%{libs_dir}/libmsiPidCreate.so %{buildroot}/%{irods_msi_path}/libmsiPidCreate.so
 install -m 755	%{libs_dir}/libmsiPidDelete.so %{buildroot}/%{irods_msi_path}/libmsiPidDelete.so
 install -m 755	%{libs_dir}/libmsiPidLookup.so %{buildroot}/%{irods_msi_path}/libmsiPidLookup.so
+install -m 755	%{libs_dir}/libmsiPidLookupKey.so %{buildroot}/%{irods_msi_path}/libmsiPidLookupKey.so
 install -m 755	%{libs_dir}/libmsiPidMove.so %{buildroot}/%{irods_msi_path}/libmsiPidMove.so
 install -m 755	%{libs_dir}/libmsiPidGet.so %{buildroot}/%{irods_msi_path}/libmsiPidGet.so
 install -m 755	%{libs_dir}/libmsiPidSet.so %{buildroot}/%{irods_msi_path}/libmsiPidSet.so
@@ -48,6 +49,7 @@ install -m 755  irods_pid.json.template %{buildroot}/etc/irods/irods_pid.json.te
 %{irods_msi_path}/libmsiPidCreate.so
 %{irods_msi_path}/libmsiPidDelete.so
 %{irods_msi_path}/libmsiPidLookup.so
+%{irods_msi_path}/libmsiPidLookupKey.so
 %{irods_msi_path}/libmsiPidMove.so
 %{irods_msi_path}/libmsiPidGet.so
 %{irods_msi_path}/libmsiPidSet.so
@@ -64,6 +66,8 @@ then
     chmod 755 %{irods_msi_path}/libmsiPidDelete.so
     chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidLookup.so
     chmod 755 %{irods_msi_path}/libmsiPidLookup.so
+    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidLookupKey.so
+    chmod 755 %{irods_msi_path}/libmsiPidLookupKey.so
     chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidMove.so
     chmod 755 %{irods_msi_path}/libmsiPidMove.so
     chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidGet.so
@@ -77,6 +81,9 @@ then
 fi
 
 %changelog
+* Tue Nov 20 2018 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - develop
+- add lookup by key
+
 * Tue Nov 13 2018 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - develop
 - add support for iRODS 4.2.3
 

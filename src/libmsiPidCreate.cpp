@@ -90,6 +90,7 @@ int msiPidCreate(msParam_t* _inPath,
   surfsara::handle::Config cfg;
   try
   {
+    rodsLog(LOG_DEBUG, "read config file %s", IRODS_PID_CONFIG_FILE);
     cfg.parseJson(IRODS_PID_CONFIG_FILE);
   }
   catch(std::exception & ex)
