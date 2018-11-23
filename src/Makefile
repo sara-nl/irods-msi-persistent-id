@@ -11,6 +11,7 @@ INC+= -I${PREFIX}/handle-cpp-client/CliArgs/include
 
 LIBS= ${LIBS_DIR}/libmsiPidCreate.so \
       ${LIBS_DIR}/libmsiPidDelete.so \
+      ${LIBS_DIR}/libmsiPidDeleteHandle.so \
       ${LIBS_DIR}/libmsiPidLookup.so \
       ${LIBS_DIR}/libmsiPidLookupKey.so \
       ${LIBS_DIR}/libmsiPidMove.so \
@@ -60,19 +61,13 @@ test: ${LIBS_DIR}/test_pid
 install:
 	cp ${LIBS_DIR}/libmsiPidCreate.so ${INSTALL_DIR}/libmsiPidCreate.so
 	cp ${LIBS_DIR}/libmsiPidDelete.so ${INSTALL_DIR}/libmsiPidDelete.so
+	cp ${LIBS_DIR}/libmsiPidDeleteHandle.so ${INSTALL_DIR}/libmsiPidDeleteHandle.so
 	cp ${LIBS_DIR}/libmsiPidLookup.so ${INSTALL_DIR}/libmsiPidLookup.so
 	cp ${LIBS_DIR}/libmsiPidLookupKey.so ${INSTALL_DIR}/libmsiPidLookupKey.so
 	cp ${LIBS_DIR}/libmsiPidMove.so   ${INSTALL_DIR}/libmsiPidMove.so
 	cp ${LIBS_DIR}/libmsiPidGet.so    ${INSTALL_DIR}/libmsiPidGet.so
 	cp ${LIBS_DIR}/libmsiPidSet.so    ${INSTALL_DIR}/libmsiPidSet.so
 	cp ${LIBS_DIR}/libmsiPidUnset.so  ${INSTALL_DIR}/libmsiPidUnset.so
-
-
-functional_test:
-	echo "todo"
-
-package:
-	echo "todo"
 
 clean:
 	rm -f ${LIBS}

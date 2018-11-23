@@ -16,7 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ********************************************************************/
 #include "libmsi_pid_common.h"
- 
+#include <sstream>
+
 extern "C"
 {
   double get_plugin_interface_version()
@@ -24,21 +25,17 @@ extern "C"
     return 1.0;
   }
 
-  int msiPidLookupKey(msParam_t* _inKey,
-                      msParam_t* _inValue,
-                      msParam_t* _outHandles,
-                      ruleExecInfo_t* rei);
+  int msiPidDeleteHandle(msParam_t* _inHandle,
+                         ruleExecInfo_t* rei);
 
   irods::ms_table_entry* plugin_factory()
   {
-    irods::ms_table_entry* msvc = new irods::ms_table_entry(3);
+    irods::ms_table_entry* msvc = new irods::ms_table_entry(1);
 #if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
-    msvc->add_operation("msiPidLookupKey", "msiPidLookupKey");
+    msvc->add_operation("msiPidDeleteHandle", "msiPidDeleteHandle");
 #elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
-    msvc->add_operation("msiPidLookupKey", std::function<int(msParam_t*,
-                                                             msParam_t*,
-                                                             msParam_t*,
-                                                             ruleExecInfo_t*)>(msiPidLookupKey));
+    msvc->add_operation("msiPidDeleteHandle", std::function<int(msParam_t*,
+                                                                ruleExecInfo_t*)>(msiPidDeleteHandle));
 #endif
     return msvc;
   }
@@ -49,10 +46,8 @@ extern "C"
 // Implemenation
 //
 ////////////////////////////////////////////////////////////////////////////////
-int msiPidLookupKey(msParam_t* _inKey,
-                    msParam_t* _inValue,
-                    msParam_t* _outHandles,
-                    ruleExecInfo_t* rei)
+int msiPidDeleteHandle(msParam_t* _inHandle,
+                       ruleExecInfo_t* rei)
 {
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;
@@ -60,11 +55,7 @@ int msiPidLookupKey(msParam_t* _inKey,
   {
     return (SYS_INTERNAL_NULL_INPUT_ERR);
   }
-  if (_inKey == NULL || _inKey->type == NULL || strcmp(_inKey->type, STR_MS_T) != 0)
-  {
-    return (USER_PARAM_TYPE_ERR);
-  }
-  if (_inValue == NULL || _inValue->type == NULL || strcmp(_inValue->type, STR_MS_T) != 0)
+  if (_inHandle == NULL || _inHandle->type == NULL || strcmp(_inHandle->type, STR_MS_T) != 0)
   {
     return (USER_PARAM_TYPE_ERR);
   }
@@ -78,25 +69,27 @@ int msiPidLookupKey(msParam_t* _inKey,
     rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
     return FILE_READ_ERR;
   }
-  auto client = cfg.makeReverseLookupClient();
-  char * key = (char*)(_inKey->inOutStruct);
-  char * value = (char*)(_inValue->inOutStruct);
+  auto client = cfg.makeHandleClient();
+  char * handle = (char*)(_inHandle->inOutStruct);
   try
   {
-    std::vector<std::string> result = client->lookup({{key, value}});
-    strArray_t * strArray = (strArray_t *)malloc( sizeof( strArray_t ) );
-    memset(strArray, 0, sizeof(strArray_t));
-    for(auto & h : result)
+    auto res = client->remove(handle);
+    if(res.success)
     {
-      addStrArray(strArray, strdup(h.c_str()));
+      return 0;
     }
-    _outHandles->inOutStruct = ( void * ) strArray;
-    _outHandles->type = strdup( StrArray_MS_T );
-    return 0;
+    else
+    {
+      std::stringstream ss;
+      ss << res;
+      rodsLog(LOG_ERROR, "failed to delete handle: %s", handle);
+      rodsLog(LOG_ERROR, "%s", ss.str().c_str());
+      return ACTION_FAILED_ERR;
+    }
   }
   catch(std::exception & ex)
   {
-    rodsLog(LOG_ERROR, "failed to lookup handle for iRods path %s", key);
+    rodsLog(LOG_ERROR, "failed to delete handle: %s", handle);
     rodsLog(LOG_ERROR, "exception: %s", ex.what());
     return ACTION_FAILED_ERR;
   }
