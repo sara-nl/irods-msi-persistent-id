@@ -1,8 +1,8 @@
 myRule {
-       msiPidGet(*path, *jsonPath, *result);
+       msiPidGet(*path, *key, *result);
        writeLine("stdout", "*result");
 }
 
 INPUT *path="/tempZone/home/rods/example.txt"
-INPUT *jsonPath="IRODS/URL"
+INPUT *key="IRODS/URL"
 OUTPUT ruleExecOut

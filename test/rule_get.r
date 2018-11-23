@@ -1,6 +1,6 @@
 myRule {
-       msiPidGet(*path, *jsonPath, *result);
+       msiPidGet(*path, *key, *result);
 }
 
-INPUT *path="/tempZone/home/rods/example.txt",*jsonPath=""
+INPUT *path="/tempZone/home/rods/example.txt",*key=""
 OUTPUT *result
