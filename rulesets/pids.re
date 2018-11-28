@@ -13,6 +13,7 @@ acPostProcForCollCreate{
 }
 
 acPostProcForPut { }
+acPostProcForCollCreate { }
 
 register(*path) {
     msiPidLookup(*path, *handle);
