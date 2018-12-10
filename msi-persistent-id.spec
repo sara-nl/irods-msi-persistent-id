@@ -45,6 +45,9 @@ install -m 755	%{libs_dir}/libmsiPidGet.so %{buildroot}/%{irods_msi_path}/libmsi
 install -m 755	%{libs_dir}/libmsiPidSet.so %{buildroot}/%{irods_msi_path}/libmsiPidSet.so
 install -m 755	%{libs_dir}/libmsiPidUnset.so %{buildroot}/%{irods_msi_path}/libmsiPidUnset.so
 install -m 755  irods_pid.json.template %{buildroot}/etc/irods/irods_pid.json.template
+install -m 755  irods_pid.json.template_2 %{buildroot}/etc/irods/irods_pid.json.template_2
+
+
 
 %files
 %{irods_msi_path}/libmsiPidCreate.so
@@ -57,6 +60,7 @@ install -m 755  irods_pid.json.template %{buildroot}/etc/irods/irods_pid.json.te
 %{irods_msi_path}/libmsiPidSet.so
 %{irods_msi_path}/libmsiPidUnset.so
 /etc/irods/irods_pid.json.template
+/etc/irods/irods_pid.json.template_2
 
 %post
 if [ -e /etc/irods/service_account.config ]
@@ -90,10 +94,15 @@ then
     chmod 755 %{irods_msi_path}/libmsiPidUnset.so
 
     chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME /etc/irods/irods_pid.json.template
+    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME /etc/irods/irods_pid.json.template_2
     chmod 644 /etc/irods/irods_pid.json.template
+    chmod 644 /etc/irods/irods_pid.json.template_2
 fi
 
 %changelog
+* Mon Dec 10 2018 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - develop
+- template mechanism for dynamic handle profiles
+
 * Tue Nov 20 2018 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - develop
 - add lookup by key
 
