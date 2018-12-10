@@ -168,6 +168,9 @@ class TestPidMicroServices(unittest.TestCase):
             assert exec_rule(session, "rule_get_key.r") == ""
             assert exec_rule(session, "rule_delete.r") == pid
 
+            with pytest.raises(Exception):
+                exec_rule(session, "rule_create_overwrite_key.r")
+
     @pytest.mark.run(order=3)
     def test_get_deleted_object(self):
         with get_session() as session:
