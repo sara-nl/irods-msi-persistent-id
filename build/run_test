@@ -5,4 +5,6 @@ DIR=/build/test
 
 set -x
 docker exec ${name}_icat_1 bash -c "rm -rf $DIR/.pytest_cache; rm -rf $DIR/__pycache__; py.test $DIR; exit \$code;"
-exit $?
+code=$?
+docker exec ${name}_icat_1 bash -c "rm -rf $DIR/.pytest_cache; rm -rf $DIR/__pycache__;"
+exit $code
