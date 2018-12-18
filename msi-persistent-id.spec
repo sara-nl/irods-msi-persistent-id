@@ -6,19 +6,13 @@ Summary:        Integration of iRODS and handle system via microservices.
 License:        GPLv3+
 Source0:        %{packagename}-%{version}.tar.gz
 
-%if "%{irodsversion}" == "4_2_3"
-  %define irods_msi_path /usr/lib/irods/plugins/microservices/
-  %define libs_dir lib/_4.2.3
+%if "%{irodsversion}" == "4.1.11"
+%define irods_msi_path /var/lib/irods/plugins/microservices/
 %else
-  %if "%{irodsversion}" == "4_2_4"
-    %define irods_msi_path /usr/lib/irods/plugins/microservices/
-    %define libs_dir lib/_4.2.4
-  %else
-     %define irods_msi_path /var/lib/irods/plugins/microservices/
-     %define libs_dir lib/_4.1.11
-  %endif
+%define irods_msi_path /usr/lib/irods/plugins/microservices/
 %endif
 
+%define libs_dir lib/_%{irodsversion}
 %define irods_config_path /etc/irods
 %define debug_package %{nil}
 

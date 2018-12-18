@@ -106,8 +106,13 @@ def main():
     container_name = "centos7_{0}_icat_1".format(irods_version.replace('.',
                                                                        '_'))
     if container_name.startswith('centos7'):
-        rpm_dir = os.path.join(repodir, 'RPMS', 'CentOS', '7')
-        rpm_dir_inside = os.path.join('/build/', 'RPMS', 'CentOS', '7')
+        create_dir = ['RPMS',
+                      'CentOS',
+                      '7',
+                      'irods-{0}'.format(irods_version)]
+        rpm_dir = os.path.join(repodir, *create_dir)
+        rpm_dir_inside = os.path.join('/build/', *create_dir)
+
     docker_exec = ["docker", "exec", container_name]
     print("irods version:  {0}".format(args.irods_version))
     print("msi version:    {0}".format(version))
