@@ -34,7 +34,7 @@ Add the yum repository to your enviornment:
     sudo cat > /etc/yum.repos.d/surfsara-irods.repo <<EOF
     [surfsara-irods]
     name=Local CentOS Repo
-    baseurl=http://145.100.59.94/CentOS/7/irods-4.1.11/
+    baseurl={{PATH_REPO}}/CentOS/7/irods-4.1.11/
     gpgcheck=0
     EOF
     
