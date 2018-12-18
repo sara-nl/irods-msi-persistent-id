@@ -96,13 +96,13 @@ class TestPidMicroServices(unittest.TestCase):
         else:
             curr_dir = os.path.dirname(os.path.dirname(__file__))
             progr = os.path.abspath(os.path.join(curr_dir,
-                                                 'handle-cpp-client',
+                                                 'surfsara-handle-client-cpp',
                                                  'handle-mockup',
                                                  'handle_mock.py'))
             config_file, backup_file = get_config_file()
 
             src_file = os.path.abspath(os.path.join(curr_dir,
-                                                    'handle-cpp-client',
+                                                    'surfsara-handle-client-cpp',
                                                     'config.json.mock'))
             if os.path.isfile(config_file):
                 shutil.copyfile(config_file, backup_file)

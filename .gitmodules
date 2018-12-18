@@ -1,0 +1,3 @@
+[submodule "surfsara-handle-client-cpp"]
+	path = surfsara-handle-client-cpp
+	url = https://github.com/sara-nl/surfsara-handle-client-cpp

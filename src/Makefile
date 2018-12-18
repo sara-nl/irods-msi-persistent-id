@@ -1,13 +1,13 @@
 PREFIX=../
-include ../irods-ci-server/config.mk
+include ../build/config.mk
 
-INC_TEST+= -I${PREFIX}/Catch2/single_include
-INC_TEST+= -I${PREFIX}/handle-cpp-client/include
-INC_TEST+= -I${PREFIX}/handle-cpp-client/json-parser-cpp/include
-INC_TEST+= -I${PREFIX}/handle-cpp-client/CliArgs/include
-INC+= -I${PREFIX}/handle-cpp-client/include
-INC+= -I${PREFIX}/handle-cpp-client/json-parser-cpp/include
-INC+= -I${PREFIX}/handle-cpp-client/CliArgs/include
+INC_TEST+= -I${PREFIX}/surfsara-handle-client-cpp/Catch2/single_include
+INC_TEST+= -I${PREFIX}/surfsara-handle-client-cpp/include
+INC_TEST+= -I${PREFIX}/surfsara-handle-client-cpp/surfsara-json-parser-cpp/include
+INC_TEST+= -I${PREFIX}/surfsara-handle-client-cpp/CliArgs/include
+INC+= -I${PREFIX}/surfsara-handle-client-cpp/include
+INC+= -I${PREFIX}/surfsara-handle-client-cpp/surfsara-json-parser-cpp/include
+INC+= -I${PREFIX}/surfsara-handle-client-cpp/CliArgs/include
 
 LIBS= ${LIBS_DIR}/libmsiPidCreate.so \
       ${LIBS_DIR}/libmsiPidDelete.so \
@@ -19,16 +19,16 @@ LIBS= ${LIBS_DIR}/libmsiPidCreate.so \
       ${LIBS_DIR}/libmsiPidSet.so \
       ${LIBS_DIR}/libmsiPidUnset.so
 
-OBJ_TEST+= ${OBJECT_DIR}/handle-cpp-client/CliArgs/tests/test_flag.o \
-	   ${OBJECT_DIR}/handle-cpp-client/CliArgs/tests/test_multiple_value.o \
-	   ${OBJECT_DIR}/handle-cpp-client/CliArgs/tests/test_value.o \
-	   ${OBJECT_DIR}/handle-cpp-client/CliArgs/tests/test_argument.o \
-	   ${OBJECT_DIR}/handle-cpp-client/CliArgs/tests/test_multiple_flag.o \
-	   ${OBJECT_DIR}/handle-cpp-client/CliArgs/tests/test_parser.o \
-	   ${OBJECT_DIR}/handle-cpp-client/json-parser-cpp/test/ast.o \
-	   ${OBJECT_DIR}/handle-cpp-client/json-parser-cpp/test/json_parser.o \
-	   ${OBJECT_DIR}/handle-cpp-client/unit_test/test_handle.o  \
-	   ${OBJECT_DIR}/handle-cpp-client/unit_test/test_util.o \
+OBJ_TEST+= ${OBJECT_DIR}/surfsara-handle-client-cpp/CliArgs/tests/test_flag.o \
+	   ${OBJECT_DIR}/surfsara-handle-client-cpp/CliArgs/tests/test_multiple_value.o \
+	   ${OBJECT_DIR}/surfsara-handle-client-cpp/CliArgs/tests/test_value.o \
+	   ${OBJECT_DIR}/surfsara-handle-client-cpp/CliArgs/tests/test_argument.o \
+	   ${OBJECT_DIR}/surfsara-handle-client-cpp/CliArgs/tests/test_multiple_flag.o \
+	   ${OBJECT_DIR}/surfsara-handle-client-cpp/CliArgs/tests/test_parser.o \
+	   ${OBJECT_DIR}/surfsara-handle-client-cpp/surfsara-json-parser-cpp/test/ast.o \
+	   ${OBJECT_DIR}/surfsara-handle-client-cpp/surfsara-json-parser-cpp/test/json_parser.o \
+	   ${OBJECT_DIR}/surfsara-handle-client-cpp/unit_test/test_handle.o  \
+	   ${OBJECT_DIR}/surfsara-handle-client-cpp/unit_test/test_util.o \
            ${OBJECT_DIR}/src/unit_test.o
 
 all: ${LIBS} ${LIBS_DIR}/test_pid

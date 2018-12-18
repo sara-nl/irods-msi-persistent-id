@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+import argparse
+from os.path import basename
+from os.path import normpath
+from os.path import dirname
+from os.path import realpath
+from util.setup import setup_composite
+
+parser = argparse.ArgumentParser(description='setup docker containers')
+parser.add_argument('system')
+args = parser.parse_args()
+volume = normpath(dirname(dirname(realpath(__file__))))
+setup_composite(volume, basename(args.system))
