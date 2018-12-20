@@ -56,7 +56,7 @@ CentOS7. It is straightforward to add additional operating systems and iRODS ver
 Requirements to build, test and package the microservices:
 * docker
 * docker-compose (> 1.21).
-  If the Linux system does not support this version, binary can be directly downloaded from 
+  If the Linux system does not support this version, the binary can be directly downloaded from 
   https://github.com/docker/compose/releases/download/1.21.2/docker-compose-Linux-x86_64
 
 
