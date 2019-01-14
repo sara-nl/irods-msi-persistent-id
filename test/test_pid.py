@@ -68,8 +68,8 @@ def exec_rule(session, rule_file, **kwargs):
 
 def get_return_value(res, index):
     sep = '---0ffaa51c-1804-11e9-9ea9-b76b05597c82---'
-    # from pprint import pprint
-    # pprint(res.MsParam_PI) # .MsParam_PI)
+    if index >= len(res.MsParam_PI):
+        return None
     buf = res.MsParam_PI[index].inOutStruct.stdoutBuf.buf
     if buf is None:
         return None
@@ -165,9 +165,9 @@ class TestPidMicroServices(unittest.TestCase):
             assert exec_rule(session, "rule_move.r") is not None
             assert exec_rule(session, "rule_lookup.r") is None
             assert exec_rule(session, "rule_move_reverse.r") is not None
-            assert exec_rule(session, "rule_lookup.r") == pid
+            assert exec_rule(session, "rule_lookup.r") == [pid]
             assert exec_rule(session, "rule_lookup_one.r") == pid
-            assert exec_rule(session, "rule_lookup_key.r") == pid
+            assert exec_rule(session, "rule_lookup_key.r") == [pid]
             assert (exec_rule(session, "rule_get_irods_url.r") ==
                     "irods://localhost/tempZone/home/rods/example.txt")
             assert exec_rule(session, "rule_get_key.r") == ""
