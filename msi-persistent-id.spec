@@ -7,9 +7,9 @@ License:        GPLv3+
 Source0:        %{packagename}-%{version}.tar.gz
 
 %if "%{irodsversion}" == "4.1.11"
-%define irods_msi_path /var/lib/irods/plugins/microservices/
+%define irods_msi_path /var/lib/irods/plugins/microservices
 %else
-%define irods_msi_path /usr/lib/irods/plugins/microservices/
+%define irods_msi_path /usr/lib/irods/plugins/microservices
 %endif
 
 %define libs_dir lib/_%{irodsversion}
