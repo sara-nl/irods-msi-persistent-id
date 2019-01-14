@@ -24,17 +24,17 @@ extern "C"
     return 1.0;
   }
 
-  int msiPidLookup(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei);
+  int msiPidLookupOne(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei);
 
   irods::ms_table_entry* plugin_factory()
   {
     irods::ms_table_entry* msvc = new irods::ms_table_entry(2);
 #if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
-    msvc->add_operation("msiPidLookup", "msiPidLookup");
+    msvc->add_operation("msiPidLookupOne", "msiPidLookupOne");
 #elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
-    msvc->add_operation("msiPidLookup", std::function<int(msParam_t*,
-                                                          msParam_t*,
-                                                          ruleExecInfo_t*)>(msiPidLookup));
+    msvc->add_operation("msiPidLookupOne", std::function<int(msParam_t*,
+                                                             msParam_t*,
+                                                             ruleExecInfo_t*)>(msiPidLookupOne));
 #endif
     return msvc;
   }
@@ -45,7 +45,7 @@ extern "C"
 // Implemenation
 //
 ////////////////////////////////////////////////////////////////////////////////
-int msiPidLookup(msParam_t* _inPath, msParam_t* _outHandles, ruleExecInfo_t* rei)
+int msiPidLookupOne(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei)
 {
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;
@@ -71,15 +71,9 @@ int msiPidLookup(msParam_t* _inPath, msParam_t* _outHandles, ruleExecInfo_t* rei
   char * path = (char*)(_inPath->inOutStruct);
   try
   {
-    std::vector<std::string> result = client->lookup(path);
-    strArray_t * strArray = (strArray_t *)malloc( sizeof( strArray_t ) );
-    memset(strArray, 0, sizeof(strArray_t));
-    for(auto & h : result)
-    {
-      addStrArray(strArray, strdup(h.c_str()));
-    }
-    _outHandles->inOutStruct = ( void * ) strArray;
-    _outHandles->type = strdup( StrArray_MS_T );
+    auto handle = client->lookupOne(path);
+    std::cout << handle << std::endl;
+    fillStrInMsParam(_outHandle, handle.c_str());
     return 0;
   }
   catch(std::exception & ex)

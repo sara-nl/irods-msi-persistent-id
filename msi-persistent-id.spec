@@ -33,6 +33,7 @@ install -m 755	%{libs_dir}/libmsiPidCreate.so %{buildroot}/%{irods_msi_path}/lib
 install -m 755	%{libs_dir}/libmsiPidDelete.so %{buildroot}/%{irods_msi_path}/libmsiPidDelete.so
 install -m 755	%{libs_dir}/libmsiPidDeleteHandle.so %{buildroot}/%{irods_msi_path}/libmsiPidDeleteHandle.so
 install -m 755	%{libs_dir}/libmsiPidLookup.so %{buildroot}/%{irods_msi_path}/libmsiPidLookup.so
+install -m 755	%{libs_dir}/libmsiPidLookupOne.so %{buildroot}/%{irods_msi_path}/libmsiPidLookupOne.so
 install -m 755	%{libs_dir}/libmsiPidLookupKey.so %{buildroot}/%{irods_msi_path}/libmsiPidLookupKey.so
 install -m 755	%{libs_dir}/libmsiPidMove.so %{buildroot}/%{irods_msi_path}/libmsiPidMove.so
 install -m 755	%{libs_dir}/libmsiPidGet.so %{buildroot}/%{irods_msi_path}/libmsiPidGet.so
@@ -48,6 +49,7 @@ install -m 755  irods_pid.json.template_2 %{buildroot}/etc/irods/irods_pid.json.
 %{irods_msi_path}/libmsiPidDelete.so
 %{irods_msi_path}/libmsiPidDeleteHandle.so
 %{irods_msi_path}/libmsiPidLookup.so
+%{irods_msi_path}/libmsiPidLookupOne.so
 %{irods_msi_path}/libmsiPidLookupKey.so
 %{irods_msi_path}/libmsiPidMove.so
 %{irods_msi_path}/libmsiPidGet.so
@@ -71,6 +73,9 @@ then
 
     chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidLookup.so
     chmod 755 %{irods_msi_path}/libmsiPidLookup.so
+
+    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidLookupOne.so
+    chmod 755 %{irods_msi_path}/libmsiPidLookupOne.so
 
     chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidLookupKey.so
     chmod 755 %{irods_msi_path}/libmsiPidLookupKey.so

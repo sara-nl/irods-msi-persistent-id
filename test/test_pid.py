@@ -67,15 +67,22 @@ def exec_rule(session, rule_file, **kwargs):
 
 
 def get_return_value(res, index):
+    sep = '---0ffaa51c-1804-11e9-9ea9-b76b05597c82---'
     # from pprint import pprint
     # pprint(res.MsParam_PI) # .MsParam_PI)
     buf = res.MsParam_PI[index].inOutStruct.stdoutBuf.buf
+    if buf is None:
+        return None
     # todo better solution here
     buf = str(buf.decode('utf-8',
                          errors='ignore')).strip().replace("\n",
                                                            "").replace('\0',
                                                                        '')
-    return buf
+    if sep in buf:
+        buf = buf.split(sep)
+        return buf[:-1]
+    else:
+        return buf
 
 
 #########################################################
@@ -139,7 +146,7 @@ class TestPidMicroServices(unittest.TestCase):
         with get_session() as session:
             rule_lookup = get_rule(session, "rule_lookup.r")
             res_lookup = rule_lookup.execute()
-            assert get_return_value(res_lookup, 0) == ""
+            assert get_return_value(res_lookup, 0) is None
             rule = get_rule(session, "rule_get.r")
             with pytest.raises(Exception):
                 rule.execute()
@@ -149,11 +156,17 @@ class TestPidMicroServices(unittest.TestCase):
         with get_session() as session:
             pid = exec_rule(session, "rule_create.r")
             assert re.match(re.escape(PREFIX) + "/.+", pid)
-            assert exec_rule(session, "rule_lookup.r") == pid
+            pid2 = exec_rule(session, "rule_create2.r")
+            assert re.match(re.escape(PREFIX) + "/.+", pid2)
+            lookup_all = exec_rule(session, "rule_lookup_all.r")
+            assert len(lookup_all) == 2
+            assert pid in lookup_all
+            assert pid2 in lookup_all
             assert exec_rule(session, "rule_move.r") is not None
-            assert exec_rule(session, "rule_lookup.r") == ""
+            assert exec_rule(session, "rule_lookup.r") is None
             assert exec_rule(session, "rule_move_reverse.r") is not None
             assert exec_rule(session, "rule_lookup.r") == pid
+            assert exec_rule(session, "rule_lookup_one.r") == pid
             assert exec_rule(session, "rule_lookup_key.r") == pid
             assert (exec_rule(session, "rule_get_irods_url.r") ==
                     "irods://localhost/tempZone/home/rods/example.txt")
@@ -176,7 +189,7 @@ class TestPidMicroServices(unittest.TestCase):
         with get_session() as session:
             rule_lookup = get_rule(session, "rule_lookup.r")
             res_lookup = rule_lookup.execute()
-            assert get_return_value(res_lookup, 0) == ""
+            assert get_return_value(res_lookup, 0) is None
             rule = get_rule(session, "rule_get.r")
             with pytest.raises(Exception):
                 rule.execute()
