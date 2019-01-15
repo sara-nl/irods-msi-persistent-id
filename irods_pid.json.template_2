@@ -1,8 +1,18 @@
 {
+  "verbose": false,
+  "curl_verbose": false,
+
+  "irods":{
+    "server": "localhost",
+    "port": 1247,
+    "url_prefix": "irods://localhost:1247",
+    "webdav_prefix": "http://localhost:80"
+  },
+
   "lookup":{
     "url": "https://epic5.storage.surfsara.nl/hrls/handles",
     "port": 8003,
-    "user": "21.T12995",
+    "prefix": "21.T12995",
     "password": "<<< PASSWORD >>>",
     "insecure": true,
     "limit": null,
@@ -11,20 +21,14 @@
     "key": "URL",
     "value": "{IRODS_WEBDAV_PREFIX}{OBJECT}"
   },
-  "irods":{
-    "server": "localhost",
-    "port": 1247,
-    "url_prefix": "irods://localhost:1247",
-    "webdav_prefix": "http://localhost:80",
-    "webdav_port": 80
-  },
+
   "handle":{
     "url": "https://epic5.storage.surfsara.nl/api/handles",
     "port": 8003,
+    "admin": "0.NA",
     "prefix": "21.T12995",
     "cert": "/etc/irods/308_21.T12995_TRAINING_certificate_only.pem",
     "key": "/etc/irods/308_21.T12995_TRAINING_privkey.pem",
-    "admin": "0.NA",
     "insecure": true,
     "passphrase": null,
     "index_from": 2,
@@ -38,7 +42,7 @@
           "type": "URL",
           "data": {
             "format": "string",
-            "value": "{IRODS_WEBDAV_PREFIX}{OBJECT}"
+            "value": "{IRODS_WEBDAV_PREFIX}/{OBJECT}"
           }
         }
       },
@@ -60,7 +64,7 @@
           "data": {
             "format": "admin",
             "value": {
-              "handle": "{HANDLE_ADMIN}/{HANDLE_PREFIX}",
+              "handle": "{HANDLE_ADMIN}{HANDLE_HANDLE}",
               "index": 200,
               "permissions": "011111110011"
             }

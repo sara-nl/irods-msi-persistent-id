@@ -1,31 +1,35 @@
 {
+  "verbose": false,
+  "curl_verbose": false,
+
+  "irods":{
+    "server": "localhost",
+    "port": 1247,
+
+    "url_prefix": "irods://localhost:1247",
+    "webdav_prefix": "http://localhost:80"
+  },
+
   "handle":{
     "url": "https://epic5.storage.surfsara.nl/api/handles",
     "port": 8003,
+    "admin": "0.NA",
     "prefix": "21.T12995",
-
     "cert": "/etc/irods/308_21.T12995_TRAINING_certificate_only.pem",
     "key": "/etc/irods/308_21.T12995_TRAINING_privkey.pem",
 
     "insecure": true,
     "passphrase": null
   },
+
   "lookup":{
     "url": "https://epic5.storage.surfsara.nl/hrls/handles",
     "port": 8003,
     "user": "21.T12995",
-
     "password": "<FILLIN_PASSWORD_FOR_REVERSE_HANDLE>",
-
     "insecure": true,
     "limit": null,
-    "page": null
-  },
-  "irods":{
-    "server": "localhost",
-    "port": 1247,
-    "url_prefix": "irods://localhost:1247",
-    "webdav_prefix": "http://localhost:80",
-    "webdav_port": 80
+    "page": null,
+    "before_create": true
   }
 }
