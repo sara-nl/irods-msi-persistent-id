@@ -19,7 +19,9 @@ LIBS= ${LIBS_DIR}/libmsiPidCreate.so \
       ${LIBS_DIR}/libmsiPidGet.so \
       ${LIBS_DIR}/libmsiPidGetHandle.so \
       ${LIBS_DIR}/libmsiPidSet.so \
-      ${LIBS_DIR}/libmsiPidUnset.so
+      ${LIBS_DIR}/libmsiPidSetHandle.so \
+      ${LIBS_DIR}/libmsiPidUnset.so \
+      ${LIBS_DIR}/libmsiPidUnsetHandle.so
 
 OBJ_TEST+= ${OBJECT_DIR}/surfsara-handle-client-cpp/CliArgs/tests/test_flag.o \
 	   ${OBJECT_DIR}/surfsara-handle-client-cpp/CliArgs/tests/test_multiple_value.o \
@@ -71,7 +73,9 @@ install:
 	cp ${LIBS_DIR}/libmsiPidGet.so    ${INSTALL_DIR}/libmsiPidGet.so
 	cp ${LIBS_DIR}/libmsiPidGetHandle.so ${INSTALL_DIR}/libmsiPidGetHandle.so
 	cp ${LIBS_DIR}/libmsiPidSet.so       ${INSTALL_DIR}/libmsiPidSet.so
+	cp ${LIBS_DIR}/libmsiPidSetHandle.so ${INSTALL_DIR}/libmsiPidSetHandle.so
 	cp ${LIBS_DIR}/libmsiPidUnset.so     ${INSTALL_DIR}/libmsiPidUnset.so
+	cp ${LIBS_DIR}/libmsiPidUnsetHandle.so ${INSTALL_DIR}/libmsiPidUnsetHandle.so
 
 clean:
 	rm -f ${LIBS}

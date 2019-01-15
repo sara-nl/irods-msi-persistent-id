@@ -18,6 +18,8 @@ limitations under the License.
 #include "libmsi_pid_common.h"
 #include "libmsi_pid_util.h"
 
+typedef std::vector<std::pair<std::string, std::string>> KeyValuePairs;
+
 extern "C"
 {
   double get_plugin_interface_version()
@@ -25,31 +27,31 @@ extern "C"
     return 1.0;
   }
 
-  int msiPidSet(msParam_t* _inPath,
+  int msiPidSetHandle(msParam_t* _inHandle,
                 msParam_t* _inKey,
                 msParam_t* _inValue,
                 msParam_t* _outHandle,
                 ruleExecInfo_t* rei)
   {
     return msiPidSetAction([](std::shared_ptr<surfsara::handle::IRodsHandleClient> client,
-                              const std::string & path,
+                              const std::string & handle,
                               const std::vector<std::pair<std::string, std::string>> & kvp) {
-                             return client->set(path, kvp);
+                             return client->setHandle(handle, kvp);
                            },
-                           _inPath, _inKey, _inValue, _outHandle, rei);
+                           _inHandle, _inKey, _inValue, _outHandle, rei);
   }
 
   irods::ms_table_entry* plugin_factory()
   {
     irods::ms_table_entry* msvc = new irods::ms_table_entry(4);
 #if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
-    msvc->add_operation("msiPidSet", "msiPidSet");
+    msvc->add_operation("msiPidSetHandle", "msiPidSetHandle");
 #elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
-    msvc->add_operation("msiPidSet", std::function<int(msParam_t*,
-                                                       msParam_t*,
-                                                       msParam_t*,
-                                                       msParam_t*,
-                                                       ruleExecInfo_t*)>(msiPidSet));
+    msvc->add_operation("msiPidSetHandle", std::function<int(msParam_t*,
+                                                             msParam_t*,
+                                                             msParam_t*,
+                                                             msParam_t*,
+                                                             ruleExecInfo_t*)>(msiPidSetHandle));
 #endif
     return msvc;
   }

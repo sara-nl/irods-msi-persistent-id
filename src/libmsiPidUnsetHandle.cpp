@@ -18,6 +18,7 @@ limitations under the License.
 #include "libmsi_pid_common.h"
 #include "libmsi_pid_util.h"
 
+
 extern "C"
 {
   double get_plugin_interface_version()
@@ -25,29 +26,29 @@ extern "C"
     return 1.0;
   }
 
-  int msiPidUnset(msParam_t* _inPath,
-                  msParam_t* _inKey,
-                  msParam_t* _outHandle,
-                  ruleExecInfo_t* rei)
+  int msiPidUnsetHandle(msParam_t* _inHandle,
+                        msParam_t* _inKey,
+                        msParam_t* _outHandle,
+                        ruleExecInfo_t* rei)
   {
     return msiPidUnsetAction([](std::shared_ptr<surfsara::handle::IRodsHandleClient> client,
                                 const std::string & path,
                                 const std::vector<std::string> & key) {
-                               return client->unset(path, key);
+                               return client->unsetHandle(path, key);
                              },
-                             _inPath, _inKey, _outHandle, rei);
+                             _inHandle, _inKey, _outHandle, rei);
   }
 
   irods::ms_table_entry* plugin_factory()
   {
     irods::ms_table_entry* msvc = new irods::ms_table_entry(3);
 #if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
-    msvc->add_operation("msiPidUnset", "msiPidUnset");
+    msvc->add_operation("msiPidUnsetHandle", "msiPidUnsetHandle");
 #elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
-    msvc->add_operation("msiPidUnset", std::function<int(msParam_t*,
-                                                       msParam_t*,
-                                                       msParam_t*,
-                                                       ruleExecInfo_t*)>(msiPidUnset));
+    msvc->add_operation("msiPidUnsetHandle", std::function<int(msParam_t*,
+                                                               msParam_t*,
+                                                               msParam_t*,
+                                                               ruleExecInfo_t*)>(msiPidUnsetHandle));
 #endif
     return msvc;
   }
