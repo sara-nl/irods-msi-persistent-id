@@ -17,6 +17,7 @@ LIBS= ${LIBS_DIR}/libmsiPidCreate.so \
       ${LIBS_DIR}/libmsiPidLookupKey.so \
       ${LIBS_DIR}/libmsiPidMove.so \
       ${LIBS_DIR}/libmsiPidGet.so \
+      ${LIBS_DIR}/libmsiPidGetHandle.so \
       ${LIBS_DIR}/libmsiPidSet.so \
       ${LIBS_DIR}/libmsiPidUnset.so
 
@@ -68,8 +69,9 @@ install:
 	cp ${LIBS_DIR}/libmsiPidLookupKey.so ${INSTALL_DIR}/libmsiPidLookupKey.so
 	cp ${LIBS_DIR}/libmsiPidMove.so   ${INSTALL_DIR}/libmsiPidMove.so
 	cp ${LIBS_DIR}/libmsiPidGet.so    ${INSTALL_DIR}/libmsiPidGet.so
-	cp ${LIBS_DIR}/libmsiPidSet.so    ${INSTALL_DIR}/libmsiPidSet.so
-	cp ${LIBS_DIR}/libmsiPidUnset.so  ${INSTALL_DIR}/libmsiPidUnset.so
+	cp ${LIBS_DIR}/libmsiPidGetHandle.so ${INSTALL_DIR}/libmsiPidGetHandle.so
+	cp ${LIBS_DIR}/libmsiPidSet.so       ${INSTALL_DIR}/libmsiPidSet.so
+	cp ${LIBS_DIR}/libmsiPidUnset.so     ${INSTALL_DIR}/libmsiPidUnset.so
 
 clean:
 	rm -f ${LIBS}
