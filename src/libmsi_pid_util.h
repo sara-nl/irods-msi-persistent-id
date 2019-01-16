@@ -5,6 +5,10 @@
 
 typedef std::vector<std::pair<std::string, std::string>> KeyValuePairs;
 
+using GetterFunction =
+  std::function<surfsara::handle::Result(std::shared_ptr<surfsara::handle::IRodsHandleClient> client,
+                                         const std::string & path)>;
+
 using UnsetterFunction =
   std::function<surfsara::handle::Result(std::shared_ptr<surfsara::handle::IRodsHandleClient> client,
                                          const std::string & path,
@@ -14,6 +18,12 @@ using SetterFunction =
   std::function<surfsara::handle::Result(std::shared_ptr<surfsara::handle::IRodsHandleClient> client,
                                          const std::string & path,
                                          const std::vector<std::pair<std::string, std::string>> & kvp)>;
+
+inline int msiPidGetAction(GetterFunction getter,
+                           msParam_t* _inPath,
+                           msParam_t* _inType,
+                           msParam_t* _outValue,
+                           ruleExecInfo_t* rei);
 
 inline int msiPidSetAction(SetterFunction setter,
                            msParam_t* _inStr,
@@ -33,6 +43,8 @@ inline int msiPidUnsetAction(UnsetterFunction unsetter,
 // Implemenation
 //
 ////////////////////////////////////////////////////////////////////////////////
+
+// helpers
 static std::string joinKeys(const KeyValuePairs & kvPairs)
 {
   std::string ret;
@@ -97,6 +109,74 @@ static KeyValuePairs parseInputParameters(msParam_t* _inKey, msParam_t* _inValue
   }
 }
 
+
+// implmentation
+inline int msiPidGetAction(GetterFunction getter,
+                           msParam_t* _inStr,
+                           msParam_t* _inType,
+                           msParam_t* _outValue, ruleExecInfo_t* rei)
+{
+  using Object = surfsara::ast::Object;
+  using String = surfsara::ast::String;
+  if (rei == NULL || rei->rsComm == NULL)
+  {
+    return (SYS_INTERNAL_NULL_INPUT_ERR);
+  }
+  if (_inStr == NULL || _inStr->type == NULL || strcmp(_inStr->type, STR_MS_T) != 0)
+  {
+    return (USER_PARAM_TYPE_ERR);
+  }
+  if (_inType == NULL || _inType->type == NULL || strcmp(_inType->type, STR_MS_T) != 0)
+  {
+    return (USER_PARAM_TYPE_ERR);
+  }
+  surfsara::handle::Config cfg;
+  try
+  {
+    cfg.parseJson(IRODS_PID_CONFIG_FILE);
+  }
+  catch(std::exception & ex)
+  {
+    rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
+    return FILE_READ_ERR;
+  }
+  auto client = cfg.makeIRodsHandleClient();
+  std::string inType = std::string((char*)(_inType->inOutStruct));
+  char * pathOrHandle = (char*)(_inStr->inOutStruct);
+  try
+  {
+    auto res = getter(client, pathOrHandle);
+    if(res.success)
+    {
+      if(inType.empty())
+      {
+        auto jsonString = surfsara::ast::formatJson(res.data, true);
+        fillStrInMsParam(_outValue, jsonString.c_str());
+      }
+      else
+      {
+        auto result = surfsara::handle::extractValueByType(res.data, inType);
+        fillStrInMsParam(_outValue, result.c_str());
+      }
+      return 0;
+    }
+    else
+    {
+      std::stringstream ss;
+      ss << res;
+      rodsLog(LOG_ERROR, "failed to get details from %s", pathOrHandle);
+      rodsLog(LOG_ERROR, "%s", ss.str().c_str());
+      return ACTION_FAILED_ERR;
+    }
+  }
+  catch(std::exception & ex)
+  {
+    rodsLog(LOG_ERROR, "failed to get details from %s", pathOrHandle);
+    rodsLog(LOG_ERROR, "exception: %s", ex.what());
+    return ACTION_FAILED_ERR;
+  }
+}
+
 inline int msiPidSetAction(SetterFunction setter,
                            msParam_t* _inStr,
                            msParam_t* _inKey,
@@ -148,7 +228,10 @@ inline int msiPidSetAction(SetterFunction setter,
          res.data.as<Object>().has("handle") &&
          res.data.as<Object>()["handle"].isA<String>())
       {
-        fillStrInMsParam(_outHandle, res.data.as<Object>()["handle"].as<String>().c_str());
+        if(_outHandle)
+        {
+          fillStrInMsParam(_outHandle, res.data.as<Object>()["handle"].as<String>().c_str());
+        }
         return 0;
       }
       else
@@ -225,7 +308,10 @@ inline int msiPidUnsetAction(UnsetterFunction unsetter,
          res.data.as<Object>().has("handle") &&
          res.data.as<Object>()["handle"].isA<String>())
       {
-        fillStrInMsParam(_outHandle, res.data.as<Object>()["handle"].as<String>().c_str());
+        if(_outHandle)
+        {
+          fillStrInMsParam(_outHandle, res.data.as<Object>()["handle"].as<String>().c_str());
+        }
         return 0;
       }
       else

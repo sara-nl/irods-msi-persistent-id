@@ -72,7 +72,6 @@ int msiPidLookupOne(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* r
   try
   {
     auto handle = client->lookupOne(path);
-    std::cout << handle << std::endl;
     fillStrInMsParam(_outHandle, handle.c_str());
     return 0;
   }

@@ -16,7 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ********************************************************************/
 #include "libmsi_pid_common.h"
- 
+#include "libmsi_pid_util.h"
+
 extern "C"
 {
   double get_plugin_interface_version()
@@ -24,10 +25,17 @@ extern "C"
     return 1.0;
   }
 
-  int msiPidGet(msParam_t* _inPathOld,
-                msParam_t* _inPathNew,
-                msParam_t* _outHandle,
-                ruleExecInfo_t* rei);
+  int msiPidGet(msParam_t* _inPath,
+                msParam_t* _inType,
+                msParam_t* _outValue,
+                ruleExecInfo_t* rei)
+  {
+    return msiPidGetAction([](std::shared_ptr<surfsara::handle::IRodsHandleClient> client,
+                              const std::string & path) {
+                             return client->get(path);
+                           },
+                           _inPath, _inType, _outValue, rei);
+  }
 
   irods::ms_table_entry* plugin_factory()
   {
@@ -41,75 +49,5 @@ extern "C"
                                                        ruleExecInfo_t*)>(msiPidGet));
 #endif
     return msvc;
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-//
-// Implemenation
-//
-////////////////////////////////////////////////////////////////////////////////
-int msiPidGet(msParam_t* _inPath,
-              msParam_t* _inType,
-              msParam_t* _outValue, ruleExecInfo_t* rei)
-{
-  using Object = surfsara::ast::Object;
-  using String = surfsara::ast::String;
-  if (rei == NULL || rei->rsComm == NULL)
-  {
-    return (SYS_INTERNAL_NULL_INPUT_ERR);
-  }
-  if (_inPath == NULL || _inPath->type == NULL || strcmp(_inPath->type, STR_MS_T) != 0)
-  {
-    return (USER_PARAM_TYPE_ERR);
-  }
-  if (_inType == NULL || _inType->type == NULL || strcmp(_inType->type, STR_MS_T) != 0)
-  {
-    return (USER_PARAM_TYPE_ERR);
-  }
-  surfsara::handle::Config cfg;
-  try
-  {
-    cfg.parseJson(IRODS_PID_CONFIG_FILE);
-  }
-  catch(std::exception & ex)
-  {
-    rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
-    return FILE_READ_ERR;
-  }
-  auto client = cfg.makeIRodsHandleClient();
-  char * path = (char*)(_inPath->inOutStruct);
-  std::string inType = std::string((char*)(_inType->inOutStruct));
-  try
-  {
-    auto res = client->get(path);
-    if(res.success)
-    {
-      if(inType.empty())
-      {
-        auto jsonString = surfsara::ast::formatJson(res.data, true);
-        fillStrInMsParam(_outValue, jsonString.c_str());
-      }
-      else
-      {
-        auto result = surfsara::handle::extractValueByType(res.data, inType);
-        fillStrInMsParam(_outValue, result.c_str());
-      }
-      return 0;
-    }
-    else
-    {
-      std::stringstream ss;
-      ss << res;
-      rodsLog(LOG_ERROR, "failed to get details of PID for iRods path from %s", path);
-      rodsLog(LOG_ERROR, "%s", ss.str().c_str());
-      return ACTION_FAILED_ERR;
-    }
-  }
-  catch(std::exception & ex)
-  {
-    rodsLog(LOG_ERROR, "failed to get details of PID for iRods path from %s", path);
-    rodsLog(LOG_ERROR, "exception: %s", ex.what());
-    return ACTION_FAILED_ERR;
   }
 }

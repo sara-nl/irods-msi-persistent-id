@@ -17,72 +17,16 @@
 ##############################################################################
 import pytest
 import unittest
-import os
-import subprocess
-import signal
-import time
-import shutil
 import re
-from irods.session import iRODSSession
-from irods.rule import Rule
+
+from util import exec_rule
+from util import exec_rule_list
+from util import ensure_handle_service
+from util import stop_handle_service
 
 process = None
-PORT = 5000
-PID_FILE = "/var/handle_mock_%d.pid" % PORT
-LOG_FILE = "/var/log/handle_mock_%d.log" % PORT
 PREFIX = "21.T12995"
-
-
-#########################################################
-#
-# helper functions
-#
-#########################################################
-def get_config_file():
-    config_file = os.path.abspath('/etc/irods/irods_pid.json')
-    backup_file = "%s.back.%d" % (config_file, os.getpid())
-    return (config_file, backup_file)
-
-
-def get_session():
-    return iRODSSession(host='localhost',
-                        port=1247, user='rods',
-                        password='test',
-                        zone='tempZone')
-
-
-def get_rule(session, rule_file, **kwargs):
-    params = {"*" + k: '"{0}"'.format(v.replace('"', '\\"'))
-              for k, v in kwargs.items()}
-    rule_path = os.path.join(os.path.dirname(__file__), rule_file)
-    return Rule(session,
-                rule_file=rule_path,
-                params=params)
-
-
-def exec_rule(session, rule_file, **kwargs):
-    rule = get_rule(session, rule_file, **kwargs)
-    res = rule.execute()
-    return get_return_value(res, 0)
-
-
-def get_return_value(res, index):
-    sep = '---0ffaa51c-1804-11e9-9ea9-b76b05597c82---'
-    if index >= len(res.MsParam_PI):
-        return None
-    buf = res.MsParam_PI[index].inOutStruct.stdoutBuf.buf
-    if buf is None:
-        return None
-    # todo better solution here
-    buf = str(buf.decode('utf-8',
-                         errors='ignore')).strip().replace("\n",
-                                                           "").replace('\0',
-                                                                       '')
-    if sep in buf:
-        buf = buf.split(sep)
-        return buf[:-1]
-    else:
-        return buf
+PREFIX_PATTERN = re.compile(re.escape(PREFIX) + "/.+")
 
 
 #########################################################
@@ -90,106 +34,124 @@ def get_return_value(res, index):
 # tests
 #
 #########################################################
-
 class TestPidMicroServices(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        if os.path.isfile(PID_FILE):
-            pid = ""
-            with open(PID_FILE, 'r') as myfile:
-                pid = myfile.read().replace('\n', ' ')
-            raise Exception("handle process pid file exists: %s (pid: %s)" %
-                            (PID_FILE, pid))
-        else:
-            curr_dir = os.path.dirname(os.path.dirname(__file__))
-            progr = os.path.abspath(os.path.join(curr_dir,
-                                                 'surfsara-handle-client-cpp',
-                                                 'handle-mockup',
-                                                 'handle_mock.py'))
-            config_file, backup_file = get_config_file()
-
-            src_file = os.path.abspath(os.path.join(curr_dir,
-                                                    'surfsara-handle-client-cpp',
-                                                    'config.json.mock'))
-            if os.path.isfile(config_file):
-                shutil.copyfile(config_file, backup_file)
-            shutil.copyfile(src_file, config_file)
-            subprocess.Popen([progr,
-                              '--port', str(PORT),
-                              '--pid_file', PID_FILE],
-                             stdout=None,
-                             stderr=None)
-            total = 0
-            while not os.path.isfile(PID_FILE):
-                if total == 10:
-                    break
-                total += 1
-                time.sleep(1)
-            assert os.path.isfile(PID_FILE)
+        ensure_handle_service()
 
     @classmethod
     def tearDownClass(cls):
-        config_file, backup_file = get_config_file()
-        if os.path.isfile(backup_file):
-            shutil.copyfile(backup_file, config_file)
-        if os.path.isfile(PID_FILE):
-            pid = 0
-            with open(PID_FILE, 'r') as myfile:
-                pid = myfile.read().replace('\n', ' ')
-            os.kill(int(pid), signal.SIGKILL)
-        else:
-            raise Exception("handle process pid file does not exist: %s" %
-                            PID_FILE)
+        stop_handle_service()
 
-    @pytest.mark.run(order=1)
-    def test_get_pid_for_undefined_object(self):
-        with get_session() as session:
-            rule_lookup = get_rule(session, "rule_lookup.r")
-            res_lookup = rule_lookup.execute()
-            assert get_return_value(res_lookup, 0) is None
-            rule = get_rule(session, "rule_get.r")
-            with pytest.raises(Exception):
-                rule.execute()
+    def test_handle_life_time(self):
+        # #####################################
+        # Before Create
+        # #####################################
+        path1 = "/tempZone/home/rods/example1.txt"
+        path2 = "/tempZone/home/rods/example2.txt"
+        path3 = "/tempZone/home/rods/example3.txt"
 
-    @pytest.mark.run(order=2)
-    def test_pid_life_cycle_object(self):
-        with get_session() as session:
-            pid = exec_rule(session, "rule_create.r")
-            assert re.match(re.escape(PREFIX) + "/.+", pid)
-            pid2 = exec_rule(session, "rule_create2.r")
-            assert re.match(re.escape(PREFIX) + "/.+", pid2)
-            lookup_all = exec_rule(session, "rule_lookup_all.r")
-            assert len(lookup_all) == 2
-            assert pid in lookup_all
-            assert pid2 in lookup_all
-            assert exec_rule(session, "rule_move.r") is not None
-            assert exec_rule(session, "rule_lookup.r") is None
-            assert exec_rule(session, "rule_move_reverse.r") is not None
-            assert exec_rule(session, "rule_lookup.r") == [pid]
-            assert exec_rule(session, "rule_lookup_one.r") == pid
-            assert exec_rule(session, "rule_lookup_key.r") == [pid]
-            assert (exec_rule(session, "rule_get_irods_url.r") ==
-                    "irods://localhost/tempZone/home/rods/example.txt")
-            assert exec_rule(session, "rule_get_key.r") == ""
-            assert exec_rule(session, "rule_set_key.r") == pid
-            assert exec_rule(session, "rule_get_key.r",
-                             key="MYKEY") == "MYVALUE"
-            assert exec_rule(session, "rule_set_multi_key.r") == pid
-            assert exec_rule(session, "rule_get_key.r",
-                             key="MYKEY") == "MYVALUE_2"
-            assert exec_rule(session, "rule_unset_key.r") == pid
-            assert exec_rule(session, "rule_get_key.r") == ""
-            assert exec_rule(session, "rule_delete.r") == pid
+        assert exec_rule_list("rule_lookup.r", path=path1) == []
+        with pytest.raises(Exception):
+            exec_rule("rule_lookup_one.r", path=path1)
+        assert exec_rule_list("rule_lookup_key.r",
+                              value="http://localhost:80{0}".format(path1),
+                              key="URL") == []
 
-            with pytest.raises(Exception):
-                exec_rule(session, "rule_create_overwrite_key.r")
+        # #####################################
+        # Create
+        # #####################################
+        pid1 = exec_rule("rule_create.r",
+                         path=path1,
+                         key_values_inp="a,1,b,2")
+        assert PREFIX_PATTERN.match(pid1)
 
-    @pytest.mark.run(order=3)
-    def test_get_deleted_object(self):
-        with get_session() as session:
-            rule_lookup = get_rule(session, "rule_lookup.r")
-            res_lookup = rule_lookup.execute()
-            assert get_return_value(res_lookup, 0) is None
-            rule = get_rule(session, "rule_get.r")
-            with pytest.raises(Exception):
-                rule.execute()
+        pid2 = exec_rule("rule_create.r",
+                         path=path2)
+        assert PREFIX_PATTERN.match(pid2)
+
+        pid12 = exec_rule_list("rule_lookup.r",
+                               path="/tempZone/home/rods/*.txt")
+        assert len(pid12) == 2
+        assert pid1 in pid12
+        assert pid2 in pid12
+
+        with pytest.raises(Exception):
+            exec_rule("rule_lookup_one.r",
+                      path="/tempZone/home/rods/*.txt")
+        pid12 = exec_rule_list("rule_lookup_key.r",
+                               value="http://localhost:80/*",
+                               key="URL")
+        assert len(pid12) == 2
+        assert pid1 in pid12
+        assert pid2 in pid12
+
+        # #####################################
+        # Get / GetHandle
+        # #####################################
+        assert exec_rule("rule_get.r", path=path1)
+        assert exec_rule("rule_get.r", path=path1, key="a") == "1"
+        assert exec_rule("rule_get.r", path=path1, key="b") == "2"
+        assert exec_rule("rule_get_handle.r", handle=pid1, key="a") == "1"
+
+        # #####################################
+        # Move
+        # #####################################
+        assert exec_rule("rule_move.r", pathOld=path1, pathNew=path3)
+
+        with pytest.raises(Exception):
+            assert exec_rule("rule_get.r", path=path1)
+        assert exec_rule("rule_get.r", path=path3, key="a") == "1"
+        assert exec_rule("rule_get.r", path=path3, key="b") == "2"
+        assert exec_rule("rule_get_handle.r", handle=pid1, key="a") == "1"
+
+        # #####################################
+        # MoveHandle
+        # #####################################
+        assert exec_rule("rule_move_handle.r", handle=pid1, pathNew=path1)
+
+        # #####################################
+        # Set / SetHandle
+        # #####################################
+        assert exec_rule("rule_set.r", path=path1, key="b", value="3") == pid1
+        exec_rule("rule_set_handle.r", handle=pid1, key="c", value="4")
+        assert exec_rule("rule_get.r", path=path1, key="a") == "1"
+        assert exec_rule("rule_get.r", path=path1, key="b") == "3"
+        assert exec_rule("rule_get.r", path=path1, key="c") == "4"
+
+        assert exec_rule("rule_set.r", path=path2, mvalue="a,1,b,2,c,3")
+        assert exec_rule("rule_get.r", path=path2, key="a") == "1"
+        assert exec_rule("rule_get.r", path=path2, key="b") == "2"
+        assert exec_rule("rule_get.r", path=path2, key="c") == "3"
+
+        exec_rule("rule_set_handle.r", handle=pid1, mvalue="a,1,b,2,c,3")
+        assert exec_rule("rule_get.r", path=path1, key="a") == "1"
+        assert exec_rule("rule_get.r", path=path1, key="b") == "2"
+        assert exec_rule("rule_get.r", path=path1, key="c") == "3"
+
+        # #####################################
+        # Lookup key
+        # #####################################
+        pid12 = exec_rule_list("rule_lookup_key.r",
+                               value="1",
+                               key="a")
+        assert len(pid12) == 2
+        assert pid1 in pid12
+        assert pid2 in pid12
+
+        # #####################################
+        # Unset / UnsetHandle
+        # #####################################
+        assert exec_rule("rule_unset.r", path=path1, key="a") == pid1
+        assert exec_rule("rule_get.r", path=path1, key="a") == ""
+        assert exec_rule("rule_unset_handle.r", handle=pid2, key="a") == pid2
+        assert exec_rule("rule_get.r", path=path2, key="a") == ""
+
+        # #####################################
+        # Delete / DeleteHandle
+        # #####################################
+        assert exec_rule("rule_delete.r", path=path1)
+        assert exec_rule("rule_delete_handle.r", handle=pid2)
+        pid12 = exec_rule_list("rule_lookup.r",
+                               path="/tempZone/home/rods/*.txt")
+        assert len(pid12) == 0

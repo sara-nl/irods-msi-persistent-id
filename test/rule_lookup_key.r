@@ -1,10 +1,9 @@
 myRule {
-       msiPidLookupKey(*key, "*/tempZone/home/rods/example.txt", *handles);
+       msiPidLookupKey(*key, *value, *handles);
        foreach(*handles) {
-            writeLine("stdout", "*handles");
-            writeLine("stdout", "---0ffaa51c-1804-11e9-9ea9-b76b05597c82---");
+            writeLine("stdout", *handles)
        }
 }
 
-INPUT *key="IRODS/URL"
+INPUT *key="IRODS/URL", *value="http://localhost:80/tempZone/home/rods/example.txt"
 OUTPUT ruleExecOut

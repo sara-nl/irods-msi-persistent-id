@@ -67,10 +67,10 @@ int msiPidDelete(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei)
     rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
     return FILE_READ_ERR;
   }
-  auto client = cfg.makeIRodsHandleClient();
   char * path = (char*)(_inPath->inOutStruct);
   try
   {
+    auto client = cfg.makeIRodsHandleClient();
     auto res = client->remove(path);
     if(res.success)
     {

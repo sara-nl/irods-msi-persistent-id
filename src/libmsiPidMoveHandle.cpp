@@ -16,8 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ********************************************************************/
 #include "libmsi_pid_common.h"
-#include <sstream>
-
+ 
 extern "C"
 {
   double get_plugin_interface_version()
@@ -25,17 +24,19 @@ extern "C"
     return 1.0;
   }
 
-  int msiPidDeleteHandle(msParam_t* _inHandle,
-                         ruleExecInfo_t* rei);
+  int msiPidMoveHandle(msParam_t* _inHandle,
+                       msParam_t* _inPathNew,
+                       ruleExecInfo_t* rei);
 
   irods::ms_table_entry* plugin_factory()
   {
-    irods::ms_table_entry* msvc = new irods::ms_table_entry(1);
+    irods::ms_table_entry* msvc = new irods::ms_table_entry(2);
 #if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
-    msvc->add_operation("msiPidDeleteHandle", "msiPidDeleteHandle");
+    msvc->add_operation("msiPidMoveHandle", "msiPidMoveHandle");
 #elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
-    msvc->add_operation("msiPidDeleteHandle", std::function<int(msParam_t*,
-                                                                ruleExecInfo_t*)>(msiPidDeleteHandle));
+    msvc->add_operation("msiPidMoveHandle", std::function<int(msParam_t*,
+                                                              msParam_t*,
+                                                              ruleExecInfo_t*)>(msiPidMoveHandle));
 #endif
     return msvc;
   }
@@ -46,8 +47,9 @@ extern "C"
 // Implemenation
 //
 ////////////////////////////////////////////////////////////////////////////////
-int msiPidDeleteHandle(msParam_t* _inHandle,
-                       ruleExecInfo_t* rei)
+int msiPidMoveHandle(msParam_t* _inHandle,
+                     msParam_t* _inPathNew,
+                     ruleExecInfo_t* rei)
 {
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;
@@ -56,6 +58,10 @@ int msiPidDeleteHandle(msParam_t* _inHandle,
     return (SYS_INTERNAL_NULL_INPUT_ERR);
   }
   if (_inHandle == NULL || _inHandle->type == NULL || strcmp(_inHandle->type, STR_MS_T) != 0)
+  {
+    return (USER_PARAM_TYPE_ERR);
+  }
+  if (_inPathNew == NULL || _inPathNew->type == NULL || strcmp(_inPathNew->type, STR_MS_T) != 0)
   {
     return (USER_PARAM_TYPE_ERR);
   }
@@ -70,26 +76,39 @@ int msiPidDeleteHandle(msParam_t* _inHandle,
     return FILE_READ_ERR;
   }
   char * handle = (char*)(_inHandle->inOutStruct);
+  char * pathNew = (char*)(_inPathNew->inOutStruct);
   try
   {
     auto client = cfg.makeIRodsHandleClient();
-    auto res = client->removeHandle(handle);
+    auto res = client->moveHandle(handle, pathNew);
     if(res.success)
     {
-      return 0;
+      if(res.data.isA<Object>() &&
+         res.data.as<Object>().has("handle") &&
+         res.data.as<Object>()["handle"].isA<String>())
+      {
+        return 0;
+      }
+      else
+      {
+        auto tmp = surfsara::ast::formatJson(res.data, true);
+        rodsLog(LOG_ERROR, "failed to move path for handle %s to new path %s", handle, pathNew);
+        rodsLog(LOG_ERROR, "%s", tmp.c_str());
+        return UNMATCHED_KEY_OR_INDEX;
+      }
     }
     else
     {
       std::stringstream ss;
       ss << res;
-      rodsLog(LOG_ERROR, "failed to delete handle: %s", handle);
+      rodsLog(LOG_ERROR, "failed to move path for handle %s to new path %s", handle, pathNew);
       rodsLog(LOG_ERROR, "%s", ss.str().c_str());
       return ACTION_FAILED_ERR;
     }
   }
   catch(std::exception & ex)
   {
-    rodsLog(LOG_ERROR, "failed to delete handle: %s", handle);
+    rodsLog(LOG_ERROR, "failed to move path for handle %s to new path %s", handle, pathNew);
     rodsLog(LOG_ERROR, "exception: %s", ex.what());
     return ACTION_FAILED_ERR;
   }

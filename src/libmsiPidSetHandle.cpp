@@ -28,27 +28,25 @@ extern "C"
   }
 
   int msiPidSetHandle(msParam_t* _inHandle,
-                msParam_t* _inKey,
-                msParam_t* _inValue,
-                msParam_t* _outHandle,
-                ruleExecInfo_t* rei)
+                      msParam_t* _inKey,
+                      msParam_t* _inValue,
+                      ruleExecInfo_t* rei)
   {
     return msiPidSetAction([](std::shared_ptr<surfsara::handle::IRodsHandleClient> client,
                               const std::string & handle,
                               const std::vector<std::pair<std::string, std::string>> & kvp) {
                              return client->setHandle(handle, kvp);
                            },
-                           _inHandle, _inKey, _inValue, _outHandle, rei);
+                           _inHandle, _inKey, _inValue, nullptr, rei);
   }
 
   irods::ms_table_entry* plugin_factory()
   {
-    irods::ms_table_entry* msvc = new irods::ms_table_entry(4);
+    irods::ms_table_entry* msvc = new irods::ms_table_entry(3);
 #if IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 1
     msvc->add_operation("msiPidSetHandle", "msiPidSetHandle");
 #elif IRODS_VERSION_MAJOR == 4 && IRODS_VERSION_MINOR == 2
     msvc->add_operation("msiPidSetHandle", std::function<int(msParam_t*,
-                                                             msParam_t*,
                                                              msParam_t*,
                                                              msParam_t*,
                                                              ruleExecInfo_t*)>(msiPidSetHandle));

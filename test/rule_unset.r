@@ -3,6 +3,5 @@ myRule {
        writeLine("stdout", "*result");
 }
 
-INPUT *path="/tempZone/home/rods/example.txt"
-INPUT *key="MYKEY"
+INPUT *path="/tempZone/home/rods/example.txt", *key="", *mvalue=""
 OUTPUT ruleExecOut

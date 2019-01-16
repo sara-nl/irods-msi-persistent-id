@@ -1,11 +1,18 @@
 myRule {
-       *key_values = list("custom_key1", "custom_value1", "custom_key2", "custom_value2");
-       # or *key_values = ""
+       if(strlen(*key_values_inp) > 0)
+       {
+          *key_values = split(*key_values_inp, ",");
+       }
+       else
+       {
+          *key_values = "";
+       }
        msiPidCreate(*path,
                     *key_values,
                     *handle);
-       writeLine("stdout", "*handle");
+       writeLine("stdout", *handle)
 }
 
-INPUT *path="/tempZone/home/rods/example.txt"
+INPUT *path="/tempZone/home/rods/example.txt", *key_values_inp=""
 OUTPUT ruleExecOut
+
