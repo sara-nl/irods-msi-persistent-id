@@ -43,8 +43,23 @@ Add the yum repository to your enviornment:
 
 ## Configuration
 
+There are two configuration templates that can be copied and adjusted:
+1. `irods_pid.json.01_default_profile` contains all fields that are required to connect to the servers.
+ The handle profile is implicitly defined and includes the following fields:
+ * `URL`
+ * `IRODS/WEBDAV_URL`
+ * `IRODS/URL`
+ * `IRODS/SERVER`
+ * `IRODS/SERVER_PORT`
+ * `HS_ADMIN`
+
+2. `irods_pid.json.02_custom_profile`
+  This example configuration includes a template for a custom handle profile.
+  The fields of the profile can be configured as desired.
+
     cd /etc/irods/
-    cp irods_pid.json.template irods_pid.json
+    cp irods_pid.json.01_default_profile irods_pid.json
+    # or irods_pid.json.02_custom_profile
     vi irods_pid.json
 
 To test the microervices check the rule files in the test directory.
@@ -107,58 +122,69 @@ the actual operation is performed.
 * **example**:   [rule_set_handle.r](test/rule_set_handle.r)
 
 ### msiPidUnset
-* **operation**: 
-* **input**: 
-* **output**:
+* **operation**: Resolve iRODS path and remove a key from the handle
+* **input**:
+  * iRODS path
+  * key
+* **output**: the resolved handle involved
 * **example**:   [rule_unset.r](test/rule_unset.r)
 
 
 ### msiPidUnsetHandle
-* **operation**: 
+* **operation**: Remove a key from a handle
 * **input**: 
-* **output**:
+  * handle
+  * key
 * **example**:   [rule_unset_handle.r](test/rule_unset_handle.r)
 
 ### msiPidMove
-* **operation**: 
+* **operation**: Resolves handle and update all fields that incorporte the iRODS path
+  (by the definition of the handle profile).
 * **input**: 
-* **output**:
+  * iRODS path
+  * new iRODS path
+* **output**: resolved handle
 * **example**:   [rule_move.r](test/rule_move.r)
 
 ### msiPidMoveHandle
-* **operation**: 
-* **input**: 
-* **output**:
+* **operation**: Update all fields tha incorporate the iRODS path
+  (by the definition of the handle profile).
+* **input**:
+  * handle
+  * new iRODS path
 * **example**:   [rule_move_handle.r](test/rule_move_handle.r)
 
 ### msiPidDelete
-* **operation**: 
+* **operation**: Resolve a handle and remove the entry
 * **input**: 
-* **output**:
+  * iRODS path
+* **output**: the handle removed
 * **example**:   [rule_delete.r](test/rule_delete.r)
 
 ### msiPidDeleteHandle
-* **operation**: 
-* **input**: 
-* **output**:
+* **operation**: Remove a handle
+* **input**: handle
 * **example**:   [rule_delete_handle.r](test/rule_delete_handle.r)
 
 ### msiPidLookup
-* **operation**: 
-* **input**: 
-* **output**:
+* **operation**: Resolves a handle by a iRODS path. The path can contain wildcard characters.
+* **input**: iRODS path (or pattern)
+* **output**: list of handles
 * **example**:   [rule_lookup.r](test/rule_lookup.r)
 
 ### msiPidLookupOne
-* **operation**: 
-* **input**: 
-* **output**:
+* **operation**: Attempts to resolve exactly one iRODS path. Fails if none or more than one 
+ handles have been resolved.
+* **input**: iRODS path or pattern
+* **output**: handle
 * **example**:   [rule_lookup_one.r](test/rule_lookup_one.r)
 
 ### msiPidLookupKey
-* **operation**: 
+* **operation**: Resolve handle by arbitrary keys-value pair matching.
 * **input**: 
-* **output**:
+  * key
+  * value
+* **output**: list of handles
 * **example**:   [rule_lookup_key.r](test/rule_lookup_key.r)
 
 
@@ -240,7 +266,7 @@ The version number of the RPM can also be overwritten
 
 The RPMs are written to the directory RPMS/
 
-6. Make clean
+#### 6. Make clean
 
 ``` bash
 ./build/make ./build/centos7_4_1_11 clean

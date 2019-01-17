@@ -10,6 +10,17 @@
     "webdav_prefix": "http://localhost:80"
   },
 
+  "lookup":{
+    "url": "https://epic5.storage.surfsara.nl/hrls/handles",
+    "port": 8003,
+    "user": "21.T12995",
+    "password": "<FILLIN_PASSWORD_FOR_REVERSE_HANDLE>",
+    "insecure": true,
+    "limit": null,
+    "page": null,
+    "before_create": true
+  },
+
   "handle":{
     "url": "https://epic5.storage.surfsara.nl/api/handles",
     "port": 8003,
@@ -20,16 +31,6 @@
 
     "insecure": true,
     "passphrase": null
-  },
-
-  "lookup":{
-    "url": "https://epic5.storage.surfsara.nl/hrls/handles",
-    "port": 8003,
-    "user": "21.T12995",
-    "password": "<FILLIN_PASSWORD_FOR_REVERSE_HANDLE>",
-    "insecure": true,
-    "limit": null,
-    "page": null,
-    "before_create": true
   }
+
 }

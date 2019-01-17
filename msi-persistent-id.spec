@@ -36,14 +36,15 @@ install -m 755	%{libs_dir}/libmsiPidLookup.so %{buildroot}/%{irods_msi_path}/lib
 install -m 755	%{libs_dir}/libmsiPidLookupOne.so %{buildroot}/%{irods_msi_path}/libmsiPidLookupOne.so
 install -m 755	%{libs_dir}/libmsiPidLookupKey.so %{buildroot}/%{irods_msi_path}/libmsiPidLookupKey.so
 install -m 755	%{libs_dir}/libmsiPidMove.so %{buildroot}/%{irods_msi_path}/libmsiPidMove.so
+install -m 755	%{libs_dir}/libmsiPidMoveHandle.so %{buildroot}/%{irods_msi_path}/libmsiPidMoveHandle.so
 install -m 755	%{libs_dir}/libmsiPidGet.so %{buildroot}/%{irods_msi_path}/libmsiPidGet.so
 install -m 755	%{libs_dir}/libmsiPidGetHandle.so %{buildroot}/%{irods_msi_path}/libmsiPidGetHandle.so
 install -m 755	%{libs_dir}/libmsiPidSet.so %{buildroot}/%{irods_msi_path}/libmsiPidSet.so
 install -m 755	%{libs_dir}/libmsiPidSetHandle.so %{buildroot}/%{irods_msi_path}/libmsiPidSetHandle.so
 install -m 755	%{libs_dir}/libmsiPidUnset.so %{buildroot}/%{irods_msi_path}/libmsiPidUnset.so
 install -m 755	%{libs_dir}/libmsiPidUnsetHandle.so %{buildroot}/%{irods_msi_path}/libmsiPidUnsetHandle.so
-install -m 755  irods_pid.json.template %{buildroot}/etc/irods/irods_pid.json.template
-install -m 755  irods_pid.json.template_2 %{buildroot}/etc/irods/irods_pid.json.template_2
+install -m 755  irods_pid.json.01_default_profile %{buildroot}/etc/irods/irods_pid.json.01_default_profile
+install -m 755  irods_pid.json.02_custom_profile %{buildroot}/etc/irods/irods_pid.json.02_custom_profile
 
 
 
@@ -55,14 +56,15 @@ install -m 755  irods_pid.json.template_2 %{buildroot}/etc/irods/irods_pid.json.
 %{irods_msi_path}/libmsiPidLookupOne.so
 %{irods_msi_path}/libmsiPidLookupKey.so
 %{irods_msi_path}/libmsiPidMove.so
+%{irods_msi_path}/libmsiPidMoveHandle.so
 %{irods_msi_path}/libmsiPidGet.so
 %{irods_msi_path}/libmsiPidGetHandle.so
 %{irods_msi_path}/libmsiPidSet.so
 %{irods_msi_path}/libmsiPidSetHandle.so
 %{irods_msi_path}/libmsiPidUnset.so
 %{irods_msi_path}/libmsiPidUnsetHandle.so
-/etc/irods/irods_pid.json.template
-/etc/irods/irods_pid.json.template_2
+/etc/irods/irods_pid.json.01_default_profile
+/etc/irods/irods_pid.json.02_custom_profile
 
 %post
 if [ -e /etc/irods/service_account.config ]
@@ -89,6 +91,9 @@ then
     chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidMove.so
     chmod 755 %{irods_msi_path}/libmsiPidMove.so
 
+    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidMoveHandle.so
+    chmod 755 %{irods_msi_path}/libmsiPidMoveHandle.so
+
     chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidGet.so
     chmod 755 %{irods_msi_path}/libmsiPidGet.so
 
@@ -107,13 +112,17 @@ then
     chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME %{irods_msi_path}/libmsiPidUnsetHandle.so
     chmod 755 %{irods_msi_path}/libmsiPidUnsetHandle.so
 
-    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME /etc/irods/irods_pid.json.template
-    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME /etc/irods/irods_pid.json.template_2
-    chmod 644 /etc/irods/irods_pid.json.template
-    chmod 644 /etc/irods/irods_pid.json.template_2
+    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME /etc/irods/irods_pid.json.01_default_profile
+    chown $IRODS_SERVICE_ACCOUNT_NAME:$IRODS_SERVICE_GROUP_NAME /etc/irods/irods_pid.json.02_custom_profile
+
+    chmod 644 /etc/irods/irods_pid.json.01_default_profile
+    chmod 644 /etc/irods/irods_pid.json.02_custom_profile
 fi
 
 %changelog
+* Thu Jan 17 2019 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - develop
+- add microservices msiPidSetHandle, msiPidUnsetHandle, msiPidMoveHandle
+
 * Mon Dec 10 2018 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - develop
 - template mechanism for dynamic handle profiles
 

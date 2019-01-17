@@ -1,6 +1,8 @@
 PREFIX=../
 include ../build/config.mk
 
+CXX_FLAGS+= -O2
+
 INC_TEST+= -I${PREFIX}/surfsara-handle-client-cpp/Catch2/single_include
 INC_TEST+= -I${PREFIX}/surfsara-handle-client-cpp/include
 INC_TEST+= -I${PREFIX}/surfsara-handle-client-cpp/surfsara-json-parser-cpp/include
