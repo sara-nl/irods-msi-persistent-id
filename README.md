@@ -57,10 +57,12 @@ There are two configuration templates that can be copied and adjusted:
   This example configuration includes a template for a custom handle profile.
   The fields of the profile can be configured as desired.
 
+``` bash
     cd /etc/irods/
     cp irods_pid.json.01_default_profile irods_pid.json
     # or irods_pid.json.02_custom_profile
     vi irods_pid.json
+```
 
 To test the microervices check the rule files in the test directory.
 
