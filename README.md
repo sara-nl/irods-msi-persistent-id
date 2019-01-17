@@ -49,6 +49,119 @@ Add the yum repository to your enviornment:
 
 To test the microervices check the rule files in the test directory.
 
+## Usage
+
+The package provides different microservices for creating, updating, deleting, searching handles.
+Some of them come in two flavors, accepting an iRODS path or a handle as input.
+In the first case the irods path is converted into a handle by a reverse lookup before 
+the actual operation is performed.
+
+### msiPidCreate
+
+* **operation**: Create a new PID based on the configured handle profile.
+* **input**:     iRODS path, list of keys-values pairs
+* **output**:    handle
+* **example**:   [rule_create.r](test/rule_create.r)
+
+
+### msiPidGet
+
+* **operation**: Resolves iRODS to PID and retrieves information from the handle server.
+  If key is empty, the full JSON string is returned. Otherwise the value
+  of the specific key.
+* **input**:
+  * iRODS path
+  * key
+* **output**: json or value of a ceratin key
+* **example**:   [rule_get.r](test/rule_get.r)
+
+### msiPidGetHandle
+
+* **operation**: Retrieves informat from the handle server.
+  If key is empty, the full JSON string is returned. Otherwise the value
+  of the specific key.
+* **input**:
+  * handle
+  * key
+* **output**: json string or value of the key
+* **example**:   [rule_get_handle.r](test/rule_get_handle.r)
+
+### msiPidSet
+* **operation**: Resolve iRODS path and set the value of a key in the handle.
+  Multiple values can be set by passing an list of alternating key values as key.
+* **input**: 
+  * iRODS path
+  * key
+  * value
+* **output**: the resolved handle
+* **example**:   [rule_set.r](test/rule_set.r)
+
+### msiPidSetHandle
+* **operation**: Set the value of a key in the handle.
+  Multiple values can be set by passing an list of alternating key values as key.
+* **input**: 
+  * handle
+  * key
+  * value
+* **output**: the resolved handle
+* **example**:   [rule_set_handle.r](test/rule_set_handle.r)
+
+### msiPidUnset
+* **operation**: 
+* **input**: 
+* **output**:
+* **example**:   [rule_unset.r](test/rule_unset.r)
+
+
+### msiPidUnsetHandle
+* **operation**: 
+* **input**: 
+* **output**:
+* **example**:   [rule_unset_handle.r](test/rule_unset_handle.r)
+
+### msiPidMove
+* **operation**: 
+* **input**: 
+* **output**:
+* **example**:   [rule_move.r](test/rule_move.r)
+
+### msiPidMoveHandle
+* **operation**: 
+* **input**: 
+* **output**:
+* **example**:   [rule_move_handle.r](test/rule_move_handle.r)
+
+### msiPidDelete
+* **operation**: 
+* **input**: 
+* **output**:
+* **example**:   [rule_delete.r](test/rule_delete.r)
+
+### msiPidDeleteHandle
+* **operation**: 
+* **input**: 
+* **output**:
+* **example**:   [rule_delete_handle.r](test/rule_delete_handle.r)
+
+### msiPidLookup
+* **operation**: 
+* **input**: 
+* **output**:
+* **example**:   [rule_lookup.r](test/rule_lookup.r)
+
+### msiPidLookupOne
+* **operation**: 
+* **input**: 
+* **output**:
+* **example**:   [rule_lookup_one.r](test/rule_lookup_one.r)
+
+### msiPidLookupKey
+* **operation**: 
+* **input**: 
+* **output**:
+* **example**:   [rule_lookup_key.r](test/rule_lookup_key.r)
+
+
 ## Compilation testing and packaging
 This repository contains a cross-platform build systems for different iRODS version for 
 CentOS7. It is straightforward to add additional operating systems and iRODS versions.
@@ -61,7 +174,7 @@ Requirements to build, test and package the microservices:
 
 
 ### Directions
-1. Build the required docker images
+#### 1. Build the required docker images
 
 ``` bash
 cd build/centos7_4_1_11
@@ -78,7 +191,7 @@ cd -
 
 ```
 
-2. Test the required containers
+#### 2. Test the required containers
 
 ``` bash
 ./build/up ./build/centos7_4_1_11
@@ -92,7 +205,7 @@ cd -
 
 ```
 
-3. Building the iRODS micorservices and perform unit tests
+#### 3. Building the iRODS micorservices and perform unit tests
 
 ``` bash
 ./build/up ./build/centos7_4_1_11
@@ -101,14 +214,14 @@ cd -
 ```
 and likewise for the other versions
 
-4. Installing the binaries into the test container and perform functional tests
+#### 4. Installing the binaries into the test container and perform functional tests
 
 ``` bash
 ./build/install ./build/centos7_4_1_11
 ./build/run_test ./build/centos7_4_1_11
 ```
 
-5.  Create RPM
+#### 5.  Create RPM
 
 Create a RPM for the current branch
 ``` bash
