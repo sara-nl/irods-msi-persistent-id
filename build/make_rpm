@@ -41,19 +41,22 @@ def determine_git_time_stamp():
     return dtg
 
 
-def determine_version():
-    cmd = ["git", "rev-parse", "--abbrev-ref", "HEAD"]
-    cwd = os.path.dirname(__file__)
-    p = subprocess.Popen(cmd,
-                         stdout=subprocess.PIPE,
-                         stderr=sys.stderr,
-                         cwd=cwd)
-    stdout, stderr = p.communicate()
-    exit_code = p.poll()
-    if exit_code != 0:
-        raise Exception(" ".join(cmd) +
-                        "exited with code {0}".format(exit_code))
-    rev = stdout.strip()
+def determine_version(branch=None):
+    if branch is None:
+        cmd = ["git", "rev-parse", "--abbrev-ref", "HEAD"]
+        cwd = os.path.dirname(__file__)
+        p = subprocess.Popen(cmd,
+                             stdout=subprocess.PIPE,
+                             stderr=sys.stderr,
+                             cwd=cwd)
+        stdout, stderr = p.communicate()
+        exit_code = p.poll()
+        if exit_code != 0:
+            raise Exception(" ".join(cmd) +
+                            "exited with code {0}".format(exit_code))
+        rev = stdout.strip()
+    else:
+        rev = branch    
     tags_match = re.match('^v([0-9]+\\.[0-9]+\\.[0-9]+)$', rev)
     if not tags_match:
         dtg = determine_git_time_stamp()
@@ -87,13 +90,15 @@ def main():
     parser.add_argument('--version',
                         help="""version of the package,
                                 if empty determined from git""")
+    parser.add_argument('--branch',
+                        help="branch of the project")
     args = parser.parse_args()
     err = False
     if args.irods_version is None:
         print("argument --irods-version required")
         err = True
     if args.version is None:
-        version = determine_version()
+        version = determine_version(branch=args.branch)
     else:
         version = args.version
 
