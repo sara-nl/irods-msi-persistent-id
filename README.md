@@ -255,6 +255,11 @@ Create a RPM for the current branch
 ``` bash
 ./build/make_rpm --irods-version 4.1.11
 ```
+or configure it manually
+``` bash
+./build/make_rpm --irods-version 4.1.11 --branch master
+```
+
 Note the version is automatically determined:
 * if the current git HEAD is a tag in the form _vX.Y.Z_, the version of the PDF is 
   generated as X.Y.Z

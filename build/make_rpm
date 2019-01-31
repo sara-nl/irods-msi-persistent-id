@@ -56,13 +56,16 @@ def determine_version(branch=None):
                             "exited with code {0}".format(exit_code))
         rev = stdout.strip()
     else:
-        rev = branch    
+        rev = branch
     tags_match = re.match('^v([0-9]+\\.[0-9]+\\.[0-9]+)$', rev)
     if not tags_match:
+        # is a feature branch
         dtg = determine_git_time_stamp()
-        return "{0}.{1}".format(rev, dtg)
+        package_suffix = "-{0}".format(rev)
+        return (package_suffix, dtg)
     else:
-        return rev.group(1)
+        # is a release
+        return ('', rev.group(1))
 
 
 def docker_exec_cmd(docker_exec, inside_cmd):
@@ -98,12 +101,13 @@ def main():
         print("argument --irods-version required")
         err = True
     if args.version is None:
-        version = determine_version(branch=args.branch)
+        package_suffix, version = determine_version(branch=args.branch)
     else:
+        package_suffix = ""
         version = args.version
-
-    if not re.match('^[0-9]+\\.[0-9]+\\.[0-9]+$|^[^\\.]+\\.[0-9]+$', version):
-        print("invalid version, not in the form {MAJOR}.{MINOR}.{PATCH_LEVEL}")
+    if not re.match('^[0-9]+\\.[0-9]+\\.[0-9]+$|[0-9]+$', version):
+        print(("invalid version {0}, " +
+               "not in the form MAJOR.MINOR.PATCH_LEVEL").format(version))
         err = True
     if err:
         sys.exit(8)
@@ -119,10 +123,11 @@ def main():
         rpm_dir_inside = os.path.join('/build/', *create_dir)
 
     docker_exec = ["docker", "exec", container_name]
+    package = PACKAGE_NAME + package_suffix
     print("irods version:  {0}".format(args.irods_version))
     print("msi version:    {0}".format(version))
     print("container name: {0}".format(container_name))
-    print("package:        {0}".format(PACKAGE_NAME))
+    print("package:        {0}".format(package))
     print("docker exec:    {0}".format(" ".join(docker_exec)))
     print("repodir:        {0}".format(repodir))
     print("rpm_dir:        {0}".format(rpm_dir))
@@ -133,15 +138,15 @@ def main():
                     ['rpmdev-setuptree'])
     docker_exec_cmd(docker_exec,
                     ['tar', '--transform',
-                     "s/build/{0}-{1}/".format(PACKAGE_NAME, version),
+                     "s/build/{0}-{1}/".format(package, version),
                      '-cvzf',
                      '{0}/SOURCES/{1}-{2}.tar.gz'.format(RPM_ROOT,
-                                                         PACKAGE_NAME,
+                                                         package,
                                                          version),
                      '/build'])
     docker_exec_cmd(docker_exec,
                     ['rpmbuild', '-bb',
-                     '--define', 'packagename {0}'.format(PACKAGE_NAME),
+                     '--define', 'packagename {0}'.format(package),
                      '--define', 'version {0}'.format(version),
                      '--define', 'irodsversion {0}'.format(irods_version),
                      '/build/{0}.spec'.format(PACKAGE_NAME)])
