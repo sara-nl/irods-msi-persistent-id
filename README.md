@@ -53,6 +53,8 @@ There are two configuration templates that can be copied and adjusted:
  * `IRODS/SERVER_PORT`
  * `HS_ADMIN`
 
+(the default profile is predefined in the [handle submodule](https://github.com/sara-nl/surfsara-handle-client-cpp/blob/master/doc/default_profile.json) )
+
 2. `irods_pid.json.02_custom_profile`
   This example configuration includes a template for a custom handle profile.
   The fields of the profile can be configured as desired.
