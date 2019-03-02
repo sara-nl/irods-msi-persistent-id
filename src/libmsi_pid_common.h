@@ -40,7 +40,7 @@ limitations under the License.
 #include <rsDataObjOpen.hpp>
 #include <rsDataObjRead.hpp>
 #include <rsDataObjClose.hpp>
-
+#include <rsGenQuery.hpp>
 #else
 
 #error "unsupported irods version"
