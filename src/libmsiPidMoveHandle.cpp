@@ -1,5 +1,5 @@
 /*****************************************************************
-Copyright 2018, SURFsara
+Copyright 2018-2019, SURFsara
 Author Stefan Wolfsheimer
 
 
@@ -16,7 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ********************************************************************/
 #include "libmsi_pid_common.h"
- 
+#include "libmsi_pid_util.h"
+
 extern "C"
 {
   double get_plugin_interface_version()
@@ -75,6 +76,14 @@ int msiPidMoveHandle(msParam_t* _inHandle,
     rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
     return FILE_READ_ERR;
   }
+  if(!checkPermissions(cfg.getWritePermissions(), rei))
+  {
+    rodsLog(LOG_ERROR, "user %s#%s is not allowed to update handle",
+            rei->rsComm->clientUser.userName,
+            rei->rsComm->clientUser.rodsZone);
+    return MSI_OPERATION_NOT_ALLOWED;
+  }
+
   char * handle = (char*)(_inHandle->inOutStruct);
   char * pathNew = (char*)(_inPathNew->inOutStruct);
   try

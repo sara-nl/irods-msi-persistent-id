@@ -66,7 +66,40 @@ There are two configuration templates that can be copied and adjusted:
     vi irods_pid.json
 ```
 
-To test the microervices check the rule files in the test directory.
+### Configure permission
+Each microservices requires certain permissions (*read*, *write*, *create* and *delete*)
+that are configured in the permissions section
+of the configuration file. Permissions can be granted to users, groups or everybody.
+Note that using groups to check the permissions might slow down the microservice due to additional queries.
+Permissions are checked in the following order:
+
+* check if permission is granted to everybody
+* check if permission is granted to user
+* check if permission is granted to groups
+
+Examples:
+1. Everyone can read handles and perform reverse lookup.
+```
+"users_read": ["*"]
+```
+
+2. Only user "admin" can create handles
+
+```
+"users_create": ["admin"],
+"groups_create": []
+```
+
+3. Every user in group "handle" can modify handles
+
+```
+"users_write": [],
+"groups_write": ["handle"]
+```
+
+
+### Test the configuration
+To test the microervices apply the rule files in the test directory.
 
 ## Usage
 
@@ -80,6 +113,7 @@ the actual operation is performed.
 * **operation**: Create a new PID based on the configured handle profile.
 * **input**:     iRODS path, list of keys-values pairs
 * **output**:    handle
+* **required permission**: create
 * **example**:   [rule_create.r](test/rule_create.r)
 
 
@@ -92,6 +126,7 @@ the actual operation is performed.
   * iRODS path
   * key
 * **output**: json or value of a ceratin key
+* **required permission**: read
 * **example**:   [rule_get.r](test/rule_get.r)
 
 ### msiPidGetHandle
@@ -103,6 +138,7 @@ the actual operation is performed.
   * handle
   * key
 * **output**: json string or value of the key
+* **required permission**: read
 * **example**:   [rule_get_handle.r](test/rule_get_handle.r)
 
 ### msiPidSet
@@ -113,6 +149,7 @@ the actual operation is performed.
   * key
   * value
 * **output**: the resolved handle
+* **required permission**: write
 * **example**:   [rule_set.r](test/rule_set.r)
 
 ### msiPidSetHandle
@@ -123,6 +160,7 @@ the actual operation is performed.
   * key
   * value
 * **output**: the resolved handle
+* **required permission**: write
 * **example**:   [rule_set_handle.r](test/rule_set_handle.r)
 
 ### msiPidUnset
@@ -131,6 +169,7 @@ the actual operation is performed.
   * iRODS path
   * key
 * **output**: the resolved handle involved
+* **required permission**: write
 * **example**:   [rule_unset.r](test/rule_unset.r)
 
 
@@ -139,6 +178,7 @@ the actual operation is performed.
 * **input**: 
   * handle
   * key
+* **required permission**: write
 * **example**:   [rule_unset_handle.r](test/rule_unset_handle.r)
 
 ### msiPidMove
@@ -148,6 +188,7 @@ the actual operation is performed.
   * iRODS path
   * new iRODS path
 * **output**: resolved handle
+* **required permission**: write
 * **example**:   [rule_move.r](test/rule_move.r)
 
 ### msiPidMoveHandle
@@ -156,6 +197,7 @@ the actual operation is performed.
 * **input**:
   * handle
   * new iRODS path
+* **required permission**: write
 * **example**:   [rule_move_handle.r](test/rule_move_handle.r)
 
 ### msiPidDelete
@@ -163,17 +205,20 @@ the actual operation is performed.
 * **input**: 
   * iRODS path
 * **output**: the handle removed
+* **required permission**: delete
 * **example**:   [rule_delete.r](test/rule_delete.r)
 
 ### msiPidDeleteHandle
 * **operation**: Remove a handle
 * **input**: handle
+* **required permission**: delete
 * **example**:   [rule_delete_handle.r](test/rule_delete_handle.r)
 
 ### msiPidLookup
 * **operation**: Resolves a handle by a iRODS path. The path can contain wildcard characters.
 * **input**: iRODS path (or pattern)
 * **output**: list of handles
+* **required permission**: read
 * **example**:   [rule_lookup.r](test/rule_lookup.r)
 
 ### msiPidLookupOne
@@ -181,6 +226,7 @@ the actual operation is performed.
  handles have been resolved.
 * **input**: iRODS path or pattern
 * **output**: handle
+* **required permission**: read
 * **example**:   [rule_lookup_one.r](test/rule_lookup_one.r)
 
 ### msiPidLookupKey
@@ -189,6 +235,7 @@ the actual operation is performed.
   * key
   * value
 * **output**: list of handles
+* **required permission**: read
 * **example**:   [rule_lookup_key.r](test/rule_lookup_key.r)
 
 

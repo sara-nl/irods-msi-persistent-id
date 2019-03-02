@@ -1,7 +1,26 @@
+/*****************************************************************
+Copyright 2018-2019, SURFsara
+Author Stefan Wolfsheimer
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+********************************************************************/
 #pragma once
 #include "libmsi_pid_common.h"
 #include <surfsara/handle_result.h>
+#include <surfsara/handle_permissions.h>
 #include <functional>
+#include <memory>
 
 typedef std::vector<std::pair<std::string, std::string>> KeyValuePairs;
 
@@ -18,6 +37,14 @@ using SetterFunction =
   std::function<surfsara::handle::Result(std::shared_ptr<surfsara::handle::IRodsHandleClient> client,
                                          const std::string & path,
                                          const std::vector<std::pair<std::string, std::string>> & kvp)>;
+
+using Permissions = surfsara::handle::Permissions;
+
+/**
+ * Checks the permission for current user / group against permission object.
+ */
+inline bool checkPermissions(std::shared_ptr<Permissions> perm,
+                             ruleExecInfo_t* rei);
 
 inline int msiPidGetAction(GetterFunction getter,
                            msParam_t* _inPath,
@@ -110,7 +137,70 @@ static KeyValuePairs parseInputParameters(msParam_t* _inKey, msParam_t* _inValue
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+//
 // implmentation
+//
+////////////////////////////////////////////////////////////////////////////////
+inline bool checkPermissions(std::shared_ptr<Permissions> perm, ruleExecInfo_t* rei)
+{
+  if(perm->checkAny())
+  {
+    return true;
+  }
+  else if(perm->checkSome())
+  {
+    const char * zone = rei->rsComm->clientUser.rodsZone;
+    const char * user = rei->rsComm->clientUser.userName;
+    if(perm->checkUser(std::string(user) + "#" + std::string(zone)))
+    {
+      return true;
+    }
+    genQueryInp_t genQueryInp;
+    genQueryOut_t *genQueryOut = NULL;
+    memset( &genQueryInp, 0, sizeof( genQueryInp_t ) );
+    genQueryInp.maxRows = MAX_SQL_ROWS;
+    addInxIval( &genQueryInp.selectInp, COL_USER_GROUP_NAME, 1 );
+    char condstr[MAX_NAME_LEN];
+    snprintf( condstr, MAX_NAME_LEN, "= '%s'", user);
+    addInxVal( &genQueryInp.sqlCondInp, COL_USER_NAME, condstr);
+    snprintf( condstr, MAX_NAME_LEN, "= '%s'", zone);
+    addInxVal( &genQueryInp.sqlCondInp, COL_USER_ZONE, condstr);
+    sqlResult_t *group_sql_result;
+    int status = rsGenQuery( rei->rsComm, &genQueryInp, &genQueryOut );
+    bool found = false;
+    if(genQueryOut && status >= 0)
+    {
+      group_sql_result = getSqlResultByInx(genQueryOut, COL_USER_GROUP_NAME);
+      if (group_sql_result != nullptr)
+      {
+        char *group_str;
+        // iterating over groups
+        for(int j = 0; j < genQueryOut->rowCnt; j++)
+        {
+          group_str = &group_sql_result->value[group_sql_result->len * j];
+          if (strcmp(group_str, user) == 0)
+          {
+            continue;
+          }
+          if(perm->checkGroup(group_str))
+          {
+            found = true;
+            break;
+          }
+        }
+      }
+    }
+    freeGenQueryOut( &genQueryOut );
+    clearGenQueryInp( &genQueryInp );
+    return found;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 inline int msiPidGetAction(GetterFunction getter,
                            msParam_t* _inStr,
                            msParam_t* _inType,
@@ -140,6 +230,14 @@ inline int msiPidGetAction(GetterFunction getter,
     rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
     return FILE_READ_ERR;
   }
+  if(!checkPermissions(cfg.getReadPermissions(), rei))
+  {
+    rodsLog(LOG_ERROR, "user %s#%s is not allowed to create the handle",
+            rei->rsComm->clientUser.userName,
+            rei->rsComm->clientUser.rodsZone);
+    return MSI_OPERATION_NOT_ALLOWED;
+  }
+
   auto client = cfg.makeIRodsHandleClient();
   std::string inType = std::string((char*)(_inType->inOutStruct));
   char * pathOrHandle = (char*)(_inStr->inOutStruct);
@@ -186,7 +284,6 @@ inline int msiPidSetAction(SetterFunction setter,
 {
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;
-  rodsLog(LOG_ERROR, "type %s", _inKey->type);
   if (rei == NULL || rei->rsComm == NULL)
   {
     return (SYS_INTERNAL_NULL_INPUT_ERR);
@@ -217,6 +314,14 @@ inline int msiPidSetAction(SetterFunction setter,
     rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
     return FILE_READ_ERR;
   }
+  if(!checkPermissions(cfg.getWritePermissions(), rei))
+  {
+    rodsLog(LOG_ERROR, "user %s#%s is not allowed to modify handle",
+            rei->rsComm->clientUser.userName,
+            rei->rsComm->clientUser.rodsZone);
+    return MSI_OPERATION_NOT_ALLOWED;
+  }
+
   char * pathOrHandle = (char*)(_inStr->inOutStruct);
   try
   {
@@ -296,6 +401,14 @@ inline int msiPidUnsetAction(UnsetterFunction unsetter,
     rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
     return FILE_READ_ERR;
   }
+  if(!checkPermissions(cfg.getWritePermissions(), rei))
+  {
+    rodsLog(LOG_ERROR, "user %s#%s is not allowed to modify handle",
+            rei->rsComm->clientUser.userName,
+            rei->rsComm->clientUser.rodsZone);
+    return MSI_OPERATION_NOT_ALLOWED;
+  }
+
   char * pathOrHandle = (char*)(_inStr->inOutStruct);
   char * key = (char*)(_inKey->inOutStruct);
   try

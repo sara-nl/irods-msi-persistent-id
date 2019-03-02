@@ -16,6 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ********************************************************************/
 #include "libmsi_pid_common.h"
+#include "libmsi_pid_util.h"
 #include <sstream>
 
 extern "C"
@@ -60,7 +61,6 @@ int msiPidCreate(msParam_t* _inPath,
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;
   std::vector<std::pair<std::string, std::string>> keyValuePairs;
-
  
   if (rei == NULL || rei->rsComm == NULL)
   {
@@ -87,6 +87,7 @@ int msiPidCreate(msParam_t* _inPath,
       i += 2;
     }
   }
+
   surfsara::handle::Config cfg;
   try
   {
@@ -97,6 +98,13 @@ int msiPidCreate(msParam_t* _inPath,
   {
     rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
     return FILE_READ_ERR;
+  }
+  if(!checkPermissions(cfg.getCreatePermissions(), rei))
+  {
+    rodsLog(LOG_ERROR, "user %s#%s is not allowed to create the handle",
+            rei->rsComm->clientUser.userName,
+            rei->rsComm->clientUser.rodsZone);
+    return MSI_OPERATION_NOT_ALLOWED;
   }
   auto client = cfg.makeIRodsHandleClient();
   char * path = (char*)(_inPath->inOutStruct);

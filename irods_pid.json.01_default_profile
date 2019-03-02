@@ -20,7 +20,16 @@
     "page": null,
     "before_create": true
   },
-
+  "permissions":{
+    "users_read": ["*"],
+    "groups_read": ["*"],
+    "users_write": [],
+    "groups_write": [],
+    "users_create": [],
+    "groups_create": [],
+    "users_delete": [],
+    "groups_delete": []
+  },
   "handle":{
     "url": "https://epic5.storage.surfsara.nl/api/handles",
     "port": 8003,

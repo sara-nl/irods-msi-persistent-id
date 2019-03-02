@@ -1,48 +1,41 @@
 {
-  "verbose": false,
-  "curl_verbose": false,
-
   "irods":{
     "server": "localhost",
     "port": 1247,
-    "url_prefix": "irods://localhost:1247",
+    "url_prefix": "irods://localhost",
     "webdav_prefix": "http://localhost:80"
   },
-
   "lookup":{
-    "url": "https://epic5.storage.surfsara.nl/hrls/handles",
-    "port": 8003,
+    "url": "http://localhost/hrls/handles",
+    "key": "URL",
+    "value": "{IRODS_WEBDAV_PREFIX}{OBJECT}",
+    "port": 5000,
     "prefix": "21.T12995",
-    "password": "<<< PASSWORD >>>",
-    "insecure": true,
+    "password": null,
+    "insecure": null,
     "limit": null,
     "page": null,
-    "before_create": true,
-    "key": "URL",
-    "value": "{IRODS_WEBDAV_PREFIX}{OBJECT}"
+     "before_create": true
   },
   "permissions":{
     "users_read": ["*"],
     "groups_read": ["*"],
-    "users_write": [],
-    "groups_write": [],
-    "users_create": [],
+    "users_write": ["rods#tempZone"],
+    "groups_write": ["tst_group"],
+    "users_create": ["rods#tempZone"],
     "groups_create": [],
-    "users_delete": [],
+    "users_delete": ["rods#tempZone"],
     "groups_delete": []
   },
   "handle":{
-    "url": "https://epic5.storage.surfsara.nl/api/handles",
-    "port": 8003,
+    "url": "http://localhost/api/handles",
+    "port": 5000,
     "admin": "0.NA",
     "prefix": "21.T12995",
-    "cert": "/etc/irods/308_21.T12995_TRAINING_certificate_only.pem",
-    "key": "/etc/irods/308_21.T12995_TRAINING_privkey.pem",
-    "insecure": true,
+    "cert": null,
+    "key": null,
+    "insecure": null,
     "passphrase": null,
-    "index_from": 2,
-    "index_to": 99,
-    "verbose": true,
     "profile": [
       {
         "if_set": "IRODS_WEBDAV_PREFIX",
@@ -51,7 +44,7 @@
           "type": "URL",
           "data": {
             "format": "string",
-            "value": "{IRODS_WEBDAV_PREFIX}/{OBJECT}"
+            "value": "{IRODS_WEBDAV_PREFIX}{OBJECT}"
           }
         }
       },
@@ -73,7 +66,7 @@
           "data": {
             "format": "admin",
             "value": {
-              "handle": "{HANDLE_ADMIN}{HANDLE_HANDLE}",
+              "handle": "{HANDLE_ADMIN}{HANDLE_PREFIX}",
               "index": 200,
               "permissions": "011111110011"
             }
