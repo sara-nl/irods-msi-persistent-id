@@ -83,10 +83,10 @@ Examples:
 "users_read": ["*"]
 ```
 
-2. Only user "admin" can create handles
+2. Only user "admin" from zone "myZone" can create handles
 
 ```
-"users_create": ["admin"],
+"users_create": ["admin#myZone"],
 "groups_create": []
 ```
 
@@ -95,6 +95,29 @@ Examples:
 ```
 "users_write": [],
 "groups_write": ["handle"]
+```
+
+The permissions settings can be configured in the section "permissions" in the
+main configuration file 
+```
+/etc/irods/irods_pid.json
+```
+For example to allow everybody read and lookup handles:
+
+``` json
+{
+  "handle": {...},
+  "lookup": {...},
+  "permissions":{
+    "users_read": ["*"],
+    "groups_read": ["*"],
+    "users_write": [],
+    "groups_write": [],
+    "users_create": [],
+    "groups_create": [],
+    "users_delete": [],
+    "groups_delete": []
+  },
 ```
 
 
