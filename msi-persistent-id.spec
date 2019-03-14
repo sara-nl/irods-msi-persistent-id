@@ -120,6 +120,10 @@ then
 fi
 
 %changelog
+* Thu Mar 14 2019 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - develop
+- separate prefix / user for reverse lookup configuration
+- support CA certificate for reverse lookup auth
+
 * Thu Jan 17 2019 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - develop
 - add microservices msiPidSetHandle, msiPidUnsetHandle, msiPidMoveHandle
 

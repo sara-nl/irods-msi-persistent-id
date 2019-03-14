@@ -13,9 +13,11 @@
   "lookup":{
     "url": "https://epic5.storage.surfsara.nl/hrls/handles",
     "port": 8003,
+    "prefix": "21.T12995",
     "user": "21.T12995",
     "password": "<FILLIN_PASSWORD_FOR_REVERSE_HANDLE>",
     "insecure": true,
+    "cacert": null,
     "limit": null,
     "page": null,
     "before_create": true
@@ -37,8 +39,8 @@
     "prefix": "21.T12995",
     "cert": "/etc/irods/308_21.T12995_TRAINING_certificate_only.pem",
     "key": "/etc/irods/308_21.T12995_TRAINING_privkey.pem",
-
     "insecure": true,
+    "cacert": null,
     "passphrase": null
   }
 
