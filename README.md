@@ -365,6 +365,7 @@ The version number of the RPM can also be overwritten
 
 The RPMs are written to the directory RPMS/
 
+
 #### 6. Make clean
 
 ``` bash
