@@ -87,7 +87,7 @@ def ensure_handle_service():
     else:
         curr_dir = os.path.dirname(os.path.dirname(__file__))
         progr = os.path.abspath(os.path.join(curr_dir,
-                                             'surfsara-handle-client-cpp',
+                                             'handle-client-cpp',
                                              'handle-mockup',
                                              'handle_mock.py'))
         config_file, backup_file = get_config_file()
