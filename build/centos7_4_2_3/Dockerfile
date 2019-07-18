@@ -69,6 +69,7 @@ RUN yum install -y irods-externals-boost1.60.0-0-1.0-1 \
                    irods-rule-engine-plugin-python-4.2.3 \
                    irods-runtime-4.2.3 \
                    irods-server-4.2.3 && \
+                   pip install --upgrade pip && \
                    pip install python-irodsclient flask flask_restful pytest
 
 ################################################################################
