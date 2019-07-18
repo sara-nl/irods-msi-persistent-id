@@ -16,7 +16,8 @@ CXX_TEST_LIB_DIR=
 CXX_TEST_PREFIX=
 
 
-MAJOR_VERSION := $(shell if [[ $IRODS_VERSION == 4.2.* ]]; then echo "4.2"; else echo "4.1"; fi)
+MAJOR_VERSION := $(shell if [[ ${IRODS_VERSION} == 4.2.* ]]; then echo "4.2"; else echo "4.1"; fi)
+
 
 ifeq (${MAJOR_VERSION},4.2)
 	CXX = /opt/irods-externals/clang3.8-0/bin/clang++ -std=c++14
