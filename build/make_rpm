@@ -65,7 +65,7 @@ def determine_version(branch=None):
         return (package_suffix, dtg)
     else:
         # is a release
-        return ('', rev.group(1))
+        return ('', tags_match.group(1))
 
 
 def docker_exec_cmd(docker_exec, inside_cmd):
