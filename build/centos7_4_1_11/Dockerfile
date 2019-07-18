@@ -56,7 +56,7 @@ RUN pip install --upgrade pip && \
                 jsonschema \
                 python-irodsclient
 
-COPY app/odbcinst.ini /etc/odbcinst.ini
+COPY centos7_4_1_x/app/odbcinst.ini /etc/odbcinst.ini
 
 ################################################################################
 #
@@ -81,8 +81,8 @@ RUN yum install -y ftp://ftp.renci.org/pub/irods/releases/4.1.11/centos7/irods-i
 # irods setup preparation
 #
 ################################################################################
-ADD centos7_4_1_11/app/setup_answers.txt /app/setup_answers.txt
-ADD centos7_4_1_11/app/setup_irods.sh /app/setup_irods.sh
+ADD centos7_4_1_x/app/setup_answers.txt /app/setup_answers.txt
+ADD centos7_4_1_x/app/setup_irods.sh /app/setup_irods.sh
 ADD app/irods_environment.json /root/.irods/irods_environment.json
 ADD app/sleep.sh /app/sleep.sh
 ADD app/wait_for_pg.sh /app/wait_for_pg.sh
