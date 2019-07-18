@@ -281,11 +281,23 @@ cd build/centos7_4_1_11
 docker-compose build
 cd -
 
+cd build/centos7_4_1_12
+docker-compose build
+cd -
+
 cd build/centos7_4_2_3
 docker-compose build
 cd -
 
 cd build/centos7_4_2_4
+docker-compose build
+cd -
+
+cd build/centos7_4_2_5
+docker-compose build
+cd -
+
+cd build/centos7_4_2_6
 docker-compose build
 cd -
 
@@ -297,12 +309,20 @@ cd -
 ./build/up ./build/centos7_4_1_11
 ./build/down ./build/centos7_4_1_11
 
+./build/up ./build/centos7_4_1_12
+./build/down ./build/centos7_4_1_12
+
 ./build/up ./build/centos7_4_2_3
 ./build/down ./build/centos7_4_2_3
 
 ./build/up ./build/centos7_4_2_4
 ./build/down ./build/centos7_4_2_4
 
+./build/up ./build/centos7_4_2_5
+./build/down ./build/centos7_4_2_5
+
+./build/up ./build/centos7_4_2_6
+./build/down ./build/centos7_4_2_6
 ```
 
 #### 3. Building the iRODS micorservices and perform unit tests

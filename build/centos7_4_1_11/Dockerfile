@@ -67,7 +67,6 @@ RUN yum install -y ftp://ftp.renci.org/pub/irods/releases/4.1.11/centos7/irods-i
     yum install -y ftp://ftp.renci.org/pub/irods/releases/4.1.11/centos7/irods-database-plugin-postgres-1.11-centos7-x86_64.rpm && \
     yum install -y ftp://ftp.renci.org/pub/irods/releases/4.1.11/centos7/irods-runtime-4.1.11-centos7-x86_64.rpm && \
     yum install -y ftp://ftp.renci.org/pub/irods/releases/4.1.11/centos7/irods-dev-4.1.11-centos7-x86_64.rpm && \
-    yum install -y ftp://ftp.renci.org/pub/irods/plugins/irods_resource_plugin_s3/1.6/irods-resource-plugin-s3-1.6-centos7-x86_64.rpm && \
     rpm -i --replacefiles ftp://ftp.renci.org/pub/irods/releases/4.1.11/centos7/irods-icommands-4.1.11-centos7-x86_64.rpm
 
 #    pip install python-irodsclient
