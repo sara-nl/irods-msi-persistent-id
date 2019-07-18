@@ -15,15 +15,10 @@ CXX_TEST_LIBS+= -lcurl
 CXX_TEST_LIB_DIR=
 CXX_TEST_PREFIX=
 
-IS_IRODS_4_2 =
-ifeq (${IRODS_VERSION},4.2.3)
-	IS_IRODS_4_2 = yes
-endif 
-ifeq (${IRODS_VERSION},4.2.4)
-	IS_IRODS_4_2 = yes
-endif 
 
-ifdef IS_IRODS_4_2
+MAJOR_VERSION := $(shell if [[ $IRODS_VERSION == 4.2.* ]]; then echo "4.2"; else echo "4.1"; fi)
+
+ifeq (${MAJOR_VERSION},4.2)
 	CXX = /opt/irods-externals/clang3.8-0/bin/clang++ -std=c++14
 	CXX_TEST = /opt/irods-externals/clang3.8-0/bin/clang++ -std=c++14 -stdlib=libc++
 	CXX_TEST_LIB_DIR+= -L/opt/irods-externals/clang3.8-0/lib/
@@ -39,7 +34,8 @@ ifdef IS_IRODS_4_2
 	INC+=	-I/opt/irods-externals/libarchive3.3.2-0/include
 	INC+=	-I/opt/irods-externals/boost1.60.0-0/include
 	INC+=	-I../Catch2/single_include
-else ifeq (${IRODS_VERSION},4.1.11)
+endif
+ifeq (${MAJOR_VERSION},4.1)
 	CXX= g++ -std=c++11
 	CXX_TEST= g++ -std=c++11
 	CXX_FLAGS = -fPIC -shared -Wno-write-strings -Wno-deprecated
@@ -52,9 +48,6 @@ else ifeq (${IRODS_VERSION},4.1.11)
 	INC+= -I/app/irods-4.1.11/iRODS/server/icat/include/
 	INC+= -I/app/irods-4.1.11/iRODS/server/drivers/include/
 	INC+= -I/app/irods-4.1.11/iRODS/lib/api/include/
-else
-	CXX= g++ -std=c++11
-	CXX_TEST= g++ -std=c++11
 endif 
 
 OBJECT_DIR=${PREFIX}/obj/${IRODS_SUFFIX}
