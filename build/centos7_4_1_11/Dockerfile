@@ -56,7 +56,7 @@ RUN pip install --upgrade pip && \
                 jsonschema \
                 python-irodsclient
 
-COPY centos7_4_1_x/app/odbcinst.ini /etc/odbcinst.ini
+COPY app/odbcinst.ini /etc/odbcinst.ini
 
 ################################################################################
 #
