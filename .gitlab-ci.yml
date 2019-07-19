@@ -185,6 +185,7 @@ centos7_4_1_11_build:
     - ./build/up ./build/centos7_$IRODS_VERSION
     - ./build/make ./build/centos7_$IRODS_VERSION
     - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
+    - mkdir -p /repos/CentOS/7/irods-${IRODS_REPO_VERSION}/Packages/
     - cp RPMS/CentOS/7/irods-${IRODS_REPO_VERSION}/x86_64/*.rpm /repos/CentOS/7/irods-${IRODS_REPO_VERSION}/Packages/
     - createrepo --update /repos/CentOS/7/irods-${IRODS_REPO_VERSION}
 
@@ -202,6 +203,7 @@ centos7_4_1_12_build:
     - ./build/up ./build/centos7_$IRODS_VERSION
     - ./build/make ./build/centos7_$IRODS_VERSION
     - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
+    - mkdir -p /repos/CentOS/7/irods-${IRODS_REPO_VERSION}/Packages/
     - cp RPMS/CentOS/7/irods-${IRODS_REPO_VERSION}/x86_64/*.rpm /repos/CentOS/7/irods-${IRODS_REPO_VERSION}/Packages/
     - createrepo --update /repos/CentOS/7/irods-${IRODS_REPO_VERSION}
 
@@ -236,6 +238,7 @@ centos7_4_2_4_build:
     - ./build/up ./build/centos7_$IRODS_VERSION
     - ./build/make ./build/centos7_$IRODS_VERSION
     - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
+    - mkdir -p /repos/CentOS/7/irods-${IRODS_REPO_VERSION}/Packages/
     - cp RPMS/CentOS/7/irods-${IRODS_REPO_VERSION}/x86_64/*.rpm /repos/CentOS/7/irods-${IRODS_REPO_VERSION}/Packages/
     - createrepo --update /repos/CentOS/7/irods-${IRODS_REPO_VERSION}
 
@@ -253,6 +256,7 @@ centos7_4_2_5_build:
     - ./build/up ./build/centos7_$IRODS_VERSION
     - ./build/make ./build/centos7_$IRODS_VERSION
     - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
+    - mkdir -p /repos/CentOS/7/irods-${IRODS_REPO_VERSION}/Packages/
     - cp RPMS/CentOS/7/irods-${IRODS_REPO_VERSION}/x86_64/*.rpm /repos/CentOS/7/irods-${IRODS_REPO_VERSION}/Packages/
     - createrepo --update /repos/CentOS/7/irods-${IRODS_REPO_VERSION}
 
@@ -270,5 +274,6 @@ centos7_4_2_6_build:
     - ./build/up ./build/centos7_$IRODS_VERSION
     - ./build/make ./build/centos7_$IRODS_VERSION
     - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
+    - mkdir -p /repos/CentOS/7/irods-${IRODS_REPO_VERSION}/Packages/
     - cp RPMS/CentOS/7/irods-${IRODS_REPO_VERSION}/x86_64/*.rpm /repos/CentOS/7/irods-${IRODS_REPO_VERSION}/Packages/
     - createrepo --update /repos/CentOS/7/irods-${IRODS_REPO_VERSION}
