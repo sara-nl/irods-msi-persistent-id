@@ -6,11 +6,12 @@ Summary:        Integration of iRODS and handle system via microservices.
 License:        GPLv3+
 Source0:        %{packagename}-%{version}.tar.gz
 
-%if "%{irodsversion}" == "4.1.11"
+%if ( "%{irodsversion}" == "4.1.11" || "%{irodsversion}" == "4.1.12" )
 %define irods_msi_path /var/lib/irods/plugins/microservices
 %else
 %define irods_msi_path /usr/lib/irods/plugins/microservices
 %endif
+
 
 %define libs_dir lib/_%{irodsversion}
 %define irods_config_path /etc/irods
@@ -120,6 +121,9 @@ then
 fi
 
 %changelog
+* Fri Aug 9 2019 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - develop
+- setting the correct path for irods 4.1.12
+
 * Thu Mar 14 2019 Stefan Wolfsheimer <stefan.wolfsheimer@surfsara.nl> - develop
 - separate prefix / user for reverse lookup configuration
 - support CA certificate for reverse lookup auth
