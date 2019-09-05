@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+import os
+import sys
+import subprocess
+from make_util import parse_argments
+
+
+TARGET_BASE_DIR = "/repos/CentOS/7"
+REMOTE_TARGET_BASE_DIR = "/repos/CentOS/7"
+YUM_SERVER = 'software@software.irodspoc-sara.surf-hosted.nl'
+
+
+def exec_cmd(cmd, dryrun=False):
+    print(" ".join(cmd))
+    if dryrun:
+        return
+    p = subprocess.Popen(cmd,
+                         stdout=subprocess.PIPE,
+                         stderr=sys.stderr)
+    stdout, stderr = p.communicate()
+    exit_code = p.poll()
+    if exit_code != 0:
+        raise Exception(" ".join(cmd) +
+                        "exited with code {0}".format(exit_code))
+
+
+def get_repo_dir(base_dir, config):
+    target_dir = [base_dir]
+    if config.branch != '':
+        target_dir += [config.branch]
+    target_dir += ["irods-{0}".format(config.irods_version)]
+    return os.path.join(*target_dir)
+
+
+def get_target_dir(base_dir, config):
+    target_dir = [base_dir]
+    if config.branch != '':
+        target_dir += [config.branch]
+    target_dir += ["irods-{0}".format(config.irods_version),
+                   "Packages"]
+    return os.path.join(*target_dir)
+
+
+def main():
+    config = parse_argments(verbose=True,
+                            with_dryrun=True)
+    src = os.path.join(config.rpm_dir,
+                       "{0}.rpm".format(config.rpm_package))
+    target_dir = get_target_dir(TARGET_BASE_DIR, config)
+    remote_target_dir = get_target_dir(REMOTE_TARGET_BASE_DIR, config)
+    repo_dir = get_repo_dir(TARGET_BASE_DIR, config)
+    remote_repo_dir = get_repo_dir(REMOTE_TARGET_BASE_DIR, config)
+
+    if config.dryrun:
+        print("mkdir -p {0}".format(target_dir))
+    else:
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir)
+    exec_cmd(['cp', src, target_dir],
+             dryrun=config.dryrun)
+    exec_cmd(['createrepo',
+              '--update',
+              repo_dir],
+             dryrun=config.dryrun)
+
+    # ######
+    exec_cmd(['ssh', '-oStrictHostKeyChecking=no',
+              YUM_SERVER,
+              '"mkdir -p {0}/Packages"'.format(remote_target_dir)],
+             dryrun=config.dryrun)
+    exec_cmd(['scp', '-oStrictHostKeyChecking=no',
+              "{0}/{1}.rpm".format(config.rpm_dir, config.rpm_package),
+              "{0}:{1}/Packages".format(YUM_SERVER,
+                                        remote_target_dir)],
+             dryrun=config.dryrun)
+    exec_cmd(['ssh', '-oStrictHostKeyChecking=no',
+              YUM_SERVER,
+              '"create --update {0}"'.format(remote_repo_dir)],
+             dryrun=config.dryrun)
+
+
+if __name__ == '__main__':
+    main()
