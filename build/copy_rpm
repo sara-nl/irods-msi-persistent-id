@@ -20,6 +20,7 @@ def exec_cmd(cmd, dryrun=False):
     stdout, stderr = p.communicate()
     exit_code = p.poll()
     if exit_code != 0:
+        print(stderr)
         raise Exception(" ".join(cmd) +
                         "exited with code {0}".format(exit_code))
 
@@ -66,7 +67,7 @@ def main():
     # ######
     exec_cmd(['ssh', '-oStrictHostKeyChecking=no',
               YUM_SERVER,
-              '"mkdir -p {0}"'.format(remote_target_dir)],
+              'mkdir -p {0}'.format(remote_target_dir)],
              dryrun=config.dryrun)
     exec_cmd(['scp', '-oStrictHostKeyChecking=no',
               "{0}/{1}.rpm".format(config.rpm_dir, config.rpm_package),
@@ -75,7 +76,7 @@ def main():
              dryrun=config.dryrun)
     exec_cmd(['ssh', '-oStrictHostKeyChecking=no',
               YUM_SERVER,
-              '"create --update {0}"'.format(remote_repo_dir)],
+              'createrepo --update {0}'.format(remote_repo_dir)],
              dryrun=config.dryrun)
 
 

@@ -185,7 +185,7 @@ centos7_4_1_11_build:
     - ./build/up ./build/centos7_$IRODS_VERSION
     - ./build/make ./build/centos7_$IRODS_VERSION
     - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
-    - ./build/copy_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAMEw
+    - ./build/copy_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
 
 centos7_4_1_12_build:
   stage: build
