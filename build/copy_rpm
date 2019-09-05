@@ -66,11 +66,11 @@ def main():
     # ######
     exec_cmd(['ssh', '-oStrictHostKeyChecking=no',
               YUM_SERVER,
-              '"mkdir -p {0}/Packages"'.format(remote_target_dir)],
+              '"mkdir -p {0}"'.format(remote_target_dir)],
              dryrun=config.dryrun)
     exec_cmd(['scp', '-oStrictHostKeyChecking=no',
               "{0}/{1}.rpm".format(config.rpm_dir, config.rpm_package),
-              "{0}:{1}/Packages".format(YUM_SERVER,
+              "{0}:{1}".format(YUM_SERVER,
                                         remote_target_dir)],
              dryrun=config.dryrun)
     exec_cmd(['ssh', '-oStrictHostKeyChecking=no',
