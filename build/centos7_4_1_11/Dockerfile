@@ -15,7 +15,6 @@ RUN yum install -y \
     python-jsonschema \
     python-psutil \
     python-pytest \
-    python-requests \
     python-pip \
     python-behave \
     python-devel \
@@ -54,7 +53,8 @@ RUN pip install --upgrade pip && \
                 pytest \
                 s3cmd \
                 jsonschema \
-                python-irodsclient
+                python-irodsclient \
+                requests
 
 COPY app/odbcinst.ini /etc/odbcinst.ini
 
