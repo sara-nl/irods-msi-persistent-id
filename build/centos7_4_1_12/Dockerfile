@@ -63,16 +63,11 @@ COPY app/odbcinst.ini /etc/odbcinst.ini
 # irods
 #
 ################################################################################
-RUN yum install -y ftp://ftp.renci.org/pub/irods/releases/4.1.12/centos7/irods-icat-4.1.12-centos7-x86_64.rpm &&\
-    yum install -y ftp://ftp.renci.org/pub/irods/releases/4.1.12/centos7/irods-database-plugin-postgres-1.12-centos7-x86_64.rpm && \
-    yum install -y ftp://ftp.renci.org/pub/irods/releases/4.1.12/centos7/irods-runtime-4.1.12-centos7-x86_64.rpm && \
-    yum install -y ftp://ftp.renci.org/pub/irods/releases/4.1.12/centos7/irods-dev-4.1.12-centos7-x86_64.rpm && \
-    rpm -i --replacefiles ftp://ftp.renci.org/pub/irods/releases/4.1.12/centos7/irods-icommands-4.1.12-centos7-x86_64.rpm
-
-#    pip install python-irodsclient
-# --upgrade pip && \
-#    pip install  flask flask_restful pytest
-
+RUN yum install -y https://files.renci.org/pub/irods/releases/4.1.12/centos7/irods-icat-4.1.12-centos7-x86_64.rpm &&\
+    yum install -y https://files.renci.org/pub/irods/releases/4.1.12/centos7/irods-database-plugin-postgres-1.12-centos7-x86_64.rpm && \
+    yum install -y https://files.renci.org/pub/irods/releases/4.1.12/centos7/irods-runtime-4.1.12-centos7-x86_64.rpm && \
+    yum install -y https://files.renci.org/pub/irods/releases/4.1.12/centos7/irods-dev-4.1.12-centos7-x86_64.rpm && \
+    rpm -i --replacefiles https://files.renci.org/pub/irods/releases/4.1.12/centos7/irods-icommands-4.1.12-centos7-x86_64.rpm
 
 
 ################################################################################
