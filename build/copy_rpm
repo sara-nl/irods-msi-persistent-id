@@ -1,11 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import os
 import sys
 import subprocess
 from make_util import parse_argments
 
-
-TARGET_BASE_DIR = "/repos/CentOS/7"
+TARGET_BASE_DIR = "/data/RPMS/{CI_PROJECT_NAMESPACE}/{BRANCH}/CentOS/7/{IRODS_VERSION}/"
 REMOTE_TARGET_BASE_DIR = "/repos/CentOS/7"
 YUM_SERVER = 'software@software.irodspoc-sara.surf-hosted.nl'
 
@@ -26,28 +25,34 @@ def exec_cmd(cmd, dryrun=False):
 
 
 def get_repo_dir(base_dir, config):
+    branch = config.branch if config.branch else "release"
+    project = config.project if config.project else "data-management-services"
+    base_dir = base_dir.format(CI_PROJECT_NAMESPACE=project,
+                               BRANCH=branch,
+                               IRODS_VERSION="irods-{0}".format(config.irods_version))
     target_dir = [base_dir]
-    if config.branch != '':
+    if config.branch:
         target_dir += [config.branch]
     target_dir += ["irods-{0}".format(config.irods_version)]
+    print(target_dir)
     return os.path.join(*target_dir)
 
 
 def get_target_dir(base_dir, config):
-    target_dir = [base_dir]
-    if config.branch != '':
-        target_dir += [config.branch]
-    target_dir += ["irods-{0}".format(config.irods_version),
-                   "Packages"]
-    return os.path.join(*target_dir)
+    branch = config.branch if config.branch else "release"
+    project = config.project if config.project else "data-management-services"
+    return base_dir.format(CI_PROJECT_NAMESPACE=project,
+                           BRANCH=branch,
+                           IRODS_VERSION="irods-{0}".format(config.irods_version))
 
 
 def main():
     config = parse_argments(verbose=True,
                             with_dryrun=True)
     src = os.path.join(config.rpm_dir,
-                       "{0}.rpm".format(config.rpm_package))
+                      "{0}.rpm".format(config.rpm_package))
     target_dir = get_target_dir(TARGET_BASE_DIR, config)
+    target_dir = target_dir.format()
     remote_target_dir = get_target_dir(REMOTE_TARGET_BASE_DIR, config)
     repo_dir = get_repo_dir(TARGET_BASE_DIR, config)
     remote_repo_dir = get_repo_dir(REMOTE_TARGET_BASE_DIR, config)

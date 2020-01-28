@@ -23,7 +23,7 @@ def determine_git_time_stamp():
         raise Exception(" ".join(cmd) +
                         "exited with code {0}".format(exit_code))
     dtg = 0
-    for line in stdout.split('\n'):
+    for line in stdout.decode("ascii").split('\n'):
         m = re.match('Date: *([0-9]+)', line)
         if m:
             dtg = m.group(1)
@@ -47,7 +47,7 @@ def determine_version(branch=None):
         if exit_code != 0:
             raise Exception(" ".join(cmd) +
                             "exited with code {0}".format(exit_code))
-        rev = stdout.strip()
+        rev = stdout.strip().decode('ascii')
     else:
         rev = branch
     tags_match = re.match('^v([0-9]+\\.[0-9]+\\.[0-9]+)$', rev)
@@ -85,6 +85,8 @@ def parse_argments(verbose=False, with_dryrun=False):
                         if empty determined from git""")
     parser.add_argument('--branch',
                         help="branch of the project")
+    parser.add_argument('--project',
+                        help="name of the project")
     if with_dryrun:
         parser.add_argument('--dryrun',
                             action="store_true")
@@ -96,7 +98,8 @@ def parse_argments(verbose=False, with_dryrun=False):
     if args.version is None:
         (branch, version) = determine_version(branch=args.branch)
     else:
-        (branch, version) = args.version
+        branch = args.branch
+        version = args.version
     if not re.match('^[0-9]+\\.[0-9]+\\.[0-9]+$|[0-9]+$', version):
         print(("invalid version {0}, " +
                "not in the form MAJOR.MINOR.PATCH_LEVEL").format(version))
@@ -111,7 +114,7 @@ def parse_argments(verbose=False, with_dryrun=False):
                                                   1)
     if container_name.startswith('centos7'):
         create_dir = ['RPMS', 'CentOS', '7']
-        if branch != '':
+        if branch:
             create_dir += [branch]
         create_dir += ['irods-{0}'.format(irods_version)]
         rpm_dir = os.path.join(repodir, *create_dir)
@@ -119,6 +122,7 @@ def parse_argments(verbose=False, with_dryrun=False):
 
     ret = {
         'package': PACKAGE_NAME,
+        'project': args.project,
         'branch': branch,
         'rpm_root': RPM_ROOT,
         'repodir': repodir,

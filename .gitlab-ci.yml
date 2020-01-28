@@ -185,7 +185,12 @@ centos7_4_1_11_build:
     - ./build/up ./build/centos7_$IRODS_VERSION
     - ./build/make ./build/centos7_$IRODS_VERSION
     - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
-    - ./build/copy_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
+    - |
+      if [ -z "$CI_COMMIT_TAG" ]
+        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --branch $CI_COMMIT_REF_NAME
+      else
+        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --version $CI_COMMIT_TAG
+      fi
 
 centos7_4_1_12_build:
   stage: build
@@ -201,7 +206,12 @@ centos7_4_1_12_build:
     - ./build/up ./build/centos7_$IRODS_VERSION
     - ./build/make ./build/centos7_$IRODS_VERSION
     - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
-    - ./build/copy_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
+    - |
+      if [ -z "$CI_COMMIT_TAG" ]
+        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --branch $CI_COMMIT_REF_NAME
+      else
+        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --version $CI_COMMIT_TAG
+      fi
 
 centos7_4_2_3_build:
   stage: build
@@ -217,7 +227,12 @@ centos7_4_2_3_build:
     - ./build/up ./build/centos7_$IRODS_VERSION
     - ./build/make ./build/centos7_$IRODS_VERSION
     - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
-    - ./build/copy_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
+    - |
+      if [ -z "$CI_COMMIT_TAG" ]
+        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --branch $CI_COMMIT_REF_NAME
+      else
+        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --version $CI_COMMIT_TAG
+      fi
 
 centos7_4_2_4_build:
   stage: build
@@ -233,7 +248,12 @@ centos7_4_2_4_build:
     - ./build/up ./build/centos7_$IRODS_VERSION
     - ./build/make ./build/centos7_$IRODS_VERSION
     - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
-    - ./build/copy_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
+    - |
+      if [ -z "$CI_COMMIT_TAG" ]
+        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --branch $CI_COMMIT_REF_NAME
+      else
+        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --version $CI_COMMIT_TAG
+      fi
 
 centos7_4_2_5_build:
   stage: build
@@ -249,7 +269,12 @@ centos7_4_2_5_build:
     - ./build/up ./build/centos7_$IRODS_VERSION
     - ./build/make ./build/centos7_$IRODS_VERSION
     - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
-    - ./build/copy_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
+    - |
+      if [ -z "$CI_COMMIT_TAG" ]
+        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --branch $CI_COMMIT_REF_NAME
+      else
+        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --version $CI_COMMIT_TAG
+      fi
 
 centos7_4_2_6_build:
   stage: build
@@ -266,3 +291,10 @@ centos7_4_2_6_build:
     - ./build/make ./build/centos7_$IRODS_VERSION
     - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
     - ./build/copy_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
+    - |
+      if [ -z "$CI_COMMIT_TAG" ]
+        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --branch $CI_COMMIT_REF_NAME
+      else
+        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --version $CI_COMMIT_TAG
+      fi
+
