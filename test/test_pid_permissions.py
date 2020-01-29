@@ -21,8 +21,8 @@ import re
 
 from util import exec_rule_py
 from util import exec_rule
-from util import ensure_handle_service
-from util import stop_handle_service
+from util import configure_handle_service
+from util import unconfigure_handle_service
 from util import create_user_and_group
 from util import delete_user_and_group
 
@@ -41,12 +41,12 @@ class TestPidMicroServicesPermissions(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         create_user_and_group('tst_user', 'tst_group')
-        ensure_handle_service()
+        configure_handle_service()
 
     @classmethod
     def tearDownClass(cls):
         delete_user_and_group('tst_user', 'tst_group')
-        stop_handle_service()
+        unconfigure_handle_service()
 
     def test_handle_lookup(self):
         # lookup is allowed for all users and groups

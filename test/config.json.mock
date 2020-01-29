@@ -1,4 +1,6 @@
 {
+  "verbose": true,
+  "curl_verbose": true,
   "irods":{
     "server": "localhost",
     "port": 1247,
@@ -6,7 +8,7 @@
     "webdav_prefix": "http://localhost:80"
   },
   "lookup":{
-    "url": "http://localhost/hrls/handles",
+    "url": "http://handle.irods/hrls/handles",
     "key": "URL",
     "value": "{IRODS_WEBDAV_PREFIX}{OBJECT}",
     "port": 5000,
@@ -28,7 +30,7 @@
     "groups_delete": []
   },
   "handle":{
-    "url": "http://localhost/api/handles",
+    "url": "http://handle.irods/api/handles",
     "port": 5000,
     "admin": "0.NA",
     "prefix": "21.T12995",

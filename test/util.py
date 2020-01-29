@@ -6,6 +6,8 @@ from subprocess import PIPE
 from subprocess import Popen
 from irods.session import iRODSSession
 from irods.rule import Rule
+import requests
+
 PORT = 5000
 PID_FILE = "/var/handle_mock_%d.pid" % PORT
 LOG_FILE = "/var/log/handle_mock_%d.log" % PORT
@@ -15,7 +17,7 @@ def create_user_and_group(user_name, group_name):
     with iRODSSession(host='localhost',
                       port=1247,
                       user='rods',
-                      password='test',
+                      password='rods',
                       zone='tempZone') as session:
         group = session.user_groups.create(group_name)
         user = session.users.create(user_name, 'rodsuser')
@@ -32,7 +34,7 @@ def delete_user_and_group(user_name, group_name):
     with iRODSSession(host='localhost',
                       port=1247,
                       user='rods',
-                      password='test',
+                      password='rods',
                       zone='tempZone') as session:
         session.users.get(user_name).remove()
         session.user_groups.get(group_name).remove()
@@ -51,6 +53,8 @@ def exec_rule(rule_file, **kwargs):
             for k, v in kwargs.items()]
     p = Popen(cmd, stdout=PIPE, stderr=PIPE)
     res, err = p.communicate()
+    res = res.decode('utf-8')
+    err = err.decode('utf-8')
     res = res.rstrip()
     if p.returncode:
         raise RuntimeError(" ".join(cmd) + " failed: " + err)
@@ -76,52 +80,22 @@ def exec_rule_py(rule_file, user, **kwargs):
         myrule = Rule(session, rule_path)
         myrule.execute()
 
-
-def ensure_handle_service():
-    if os.path.isfile(PID_FILE):
-        pid = ""
-        with open(PID_FILE, 'r') as myfile:
-            pid = myfile.read().replace('\n', ' ')
-        raise Exception("handle process pid file exists: %s (pid: %s)" %
-                        (PID_FILE, pid))
-    else:
-        curr_dir = os.path.dirname(os.path.dirname(__file__))
-        progr = os.path.abspath(os.path.join(curr_dir,
-                                             'handle-client-cpp',
-                                             'handle-mockup',
-                                             'handle_mock.py'))
-        config_file, backup_file = get_config_file()
-
-        src_file = os.path.abspath(os.path.join(curr_dir,
-                                                'test',
-                                                'config.json.mock'))
-        if os.path.isfile(config_file):
-            shutil.copyfile(config_file, backup_file)
-        shutil.copyfile(src_file, config_file)
-
-        Popen([progr,
-               '--port', str(PORT),
-               '--pid_file', PID_FILE],
-              stdout=None,
-              stderr=None)
-        total = 0
-        while not os.path.isfile(PID_FILE):
-            if total == 10:
-                break
-            total += 1
-            time.sleep(1)
-        assert os.path.isfile(PID_FILE)
+def configure_handle_service():
+    curr_dir = os.path.dirname(os.path.dirname(__file__))
+    src_file = os.path.abspath(os.path.join(curr_dir,
+                                            'test',
+                                            'config.json.mock'))
+    config_file, backup_file = get_config_file()
+    if os.path.isfile(config_file):
+        shutil.copyfile(config_file, backup_file)
+    shutil.copyfile(src_file, config_file)
+    r = requests.delete('http://handle.irods:5000/api/reset')
+    r.raise_for_status()
+    
 
 
-def stop_handle_service():
+def unconfigure_handle_service():
+    curr_dir = os.path.dirname(os.path.dirname(__file__))
     config_file, backup_file = get_config_file()
     if os.path.isfile(backup_file):
         shutil.copyfile(backup_file, config_file)
-    if os.path.isfile(PID_FILE):
-        pid = 0
-        with open(PID_FILE, 'r') as myfile:
-            pid = myfile.read().replace('\n', ' ')
-        os.kill(int(pid), signal.SIGKILL)
-    else:
-        raise Exception("handle process pid file does not exist: %s" %
-                        PID_FILE)

@@ -21,8 +21,8 @@ import re
 
 from util import exec_rule
 from util import exec_rule_list
-from util import ensure_handle_service
-from util import stop_handle_service
+from util import configure_handle_service
+from util import unconfigure_handle_service
 
 process = None
 PREFIX = "21.T12995"
@@ -37,11 +37,11 @@ PREFIX_PATTERN = re.compile(re.escape(PREFIX) + "/.+")
 class TestPidMicroServices(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        ensure_handle_service()
+        configure_handle_service()
 
     @classmethod
     def tearDownClass(cls):
-        stop_handle_service()
+        unconfigure_handle_service()
 
     def test_handle_life_time(self):
         # #####################################
@@ -71,14 +71,14 @@ class TestPidMicroServices(unittest.TestCase):
         assert PREFIX_PATTERN.match(pid2)
 
         pid12 = exec_rule_list("rule_lookup.r",
-                               path="/tempZone/home/rods/*.txt")
+                               path="/tempZone/home/rods/*")
         assert len(pid12) == 2
         assert pid1 in pid12
         assert pid2 in pid12
 
         with pytest.raises(Exception):
             exec_rule("rule_lookup_one.r",
-                      path="/tempZone/home/rods/*.txt")
+                      path="/tempZone/home/rods/*")
         pid12 = exec_rule_list("rule_lookup_key.r",
                                value="http://localhost:80/*",
                                key="URL")
@@ -153,5 +153,5 @@ class TestPidMicroServices(unittest.TestCase):
         assert exec_rule("rule_delete.r", path=path1)
         assert exec_rule("rule_delete_handle.r", handle=pid2)
         pid12 = exec_rule_list("rule_lookup.r",
-                               path="/tempZone/home/rods/*.txt")
+                               path="/tempZone/home/rods/*")
         assert len(pid12) == 0

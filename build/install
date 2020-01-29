@@ -1,5 +1,0 @@
-#!/bin/bash
-name=$( basename $1)
-shift
-
-docker exec ${name}_icat_1 make -C /build/ install
