@@ -1,7 +1,0 @@
-#!/bin/bash
-name=$( basename $1)
-shift
-
-set -x
-docker exec ${name}_icat_1 chmod a+rw /var/lib/irods/VERSION.json 
-docker exec -u $( id -u):$( id -g) ${name}_icat_1 make -C /build/ $@

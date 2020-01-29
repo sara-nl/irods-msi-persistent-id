@@ -1,300 +1,205 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
-
+  YUM_SERVER: software@software.irodspoc-sara.surf-hosted.nl
+  PACKAGE_NAME: msi-persistent-id
 stages:
-  - build_containers
   - test
   - build
+  - publish
 
 before_script:
-  - echo "before"
-  - ./build/down ./build/centos7_4_1_11
-  - ./build/down ./build/centos7_4_1_12
-  - ./build/down ./build/centos7_4_2_3
-  - ./build/down ./build/centos7_4_2_4
-  - ./build/down ./build/centos7_4_2_5
-  - ./build/down ./build/centos7_4_2_6
-
+  - docker-compose -f build/docker-compose.yml down -v
 after_script:
-  - echo "after"
-  - ./build/down ./build/centos7_4_1_11
-  - ./build/down ./build/centos7_4_1_12
-  - ./build/down ./build/centos7_4_2_3
-  - ./build/down ./build/centos7_4_2_4
-  - ./build/down ./build/centos7_4_2_5
-  - ./build/down ./build/centos7_4_2_6
+  - docker-compose -f build/docker-compose.yml rm -f
+  - docker-compose -f build/docker-compose.yml down -v
 
-###################################
-# setup container
-###################################
-centos7_4_1_11_container:
-  stage: build_containers
-  tags:
-    - irods
-  script:
-    - docker-compose -f build/centos7_4_1_11/docker-compose.yml build
-
-centos7_4_1_12_container:
-  stage: build_containers
-  tags:
-    - irods
-  script:
-    - docker-compose -f build/centos7_4_1_12/docker-compose.yml build
-
-centos7_4_2_3_container:
-  stage: build_containers
-  tags:
-    - irods
-  script:
-    - docker-compose -f build/centos7_4_2_3/docker-compose.yml build
-
-centos7_4_2_4_container:
-  stage: build_containers
-  tags:
-    - irods
-  script:
-    - docker-compose -f build/centos7_4_2_4/docker-compose.yml build
-
-centos7_4_2_5_container:
-  stage: build_containers
-  tags:
-    - irods
-  script:
-    - docker-compose -f build/centos7_4_2_5/docker-compose.yml build
-
-centos7_4_2_6_container:
-  stage: build_containers
-  tags:
-    - irods
-  script:
-    - docker-compose -f build/centos7_4_2_6/docker-compose.yml build
-
-###################################
-# test 
-###################################
-centos7_4_1_11_test:
-  stage: test
-  tags:
-    - irods
-  variables:
-    IRODS_VERSION: '4_1_11'
-  script:
-    - pwd
-    - echo $CI_COMMIT_REF_NAME
-    - echo $CI_COMMIT_TAG
-    - ./build/up ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION test
-    - ./build/install ./build/centos7_$IRODS_VERSION
-    - ./build/run_test ./build/centos7_$IRODS_VERSION
-
+# ###############################
+# test
+# ###############################
 centos7_4_1_12_test:
   stage: test
   tags:
     - irods
   variables:
-    IRODS_VERSION: '4_1_12'
+    VERSION: centos7_4_1_12
+    VOLUME: ..
+    PROJECT: $CI_PROJECT_NAMESPACE
   script:
-    - pwd
-    - echo $CI_COMMIT_REF_NAME
-    - echo $CI_COMMIT_TAG
-    - ./build/up ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION test
-    - ./build/install ./build/centos7_$IRODS_VERSION
-    - ./build/run_test ./build/centos7_$IRODS_VERSION
-
-centos7_4_2_3_test:
-  stage: test
-  tags:
-    - irods
-  variables:
-    IRODS_VERSION: '4_2_3'
-  script:
-    - pwd
-    - echo $CI_COMMIT_REF_NAME
-    - echo $CI_COMMIT_TAG
-    - ./build/up ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION test
-    - ./build/install ./build/centos7_$IRODS_VERSION
-    - ./build/run_test ./build/centos7_$IRODS_VERSION
-
-centos7_4_2_4_test:
-  stage: test
-  tags:
-    - irods
-  variables:
-    IRODS_VERSION: '4_2_4'
-  script:
-    - pwd
-    - echo $CI_COMMIT_REF_NAME
-    - echo $CI_COMMIT_TAG
-    - ./build/up ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION test
-    - ./build/install ./build/centos7_$IRODS_VERSION
-    - ./build/run_test ./build/centos7_$IRODS_VERSION
-
-centos7_4_2_5_test:
-  stage: test
-  tags:
-    - irods
-  variables:
-    IRODS_VERSION: '4_2_5'
-  script:
-    - pwd
-    - echo $CI_COMMIT_REF_NAME
-    - echo $CI_COMMIT_TAG
-    - ./build/up ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION test
-    - ./build/install ./build/centos7_$IRODS_VERSION
-    - ./build/run_test ./build/centos7_$IRODS_VERSION
+    - build/gitlab_test.sh
 
 centos7_4_2_6_test:
   stage: test
   tags:
     - irods
   variables:
-    IRODS_VERSION: '4_2_6'
+    VERSION: centos7_4_2_6
+    VOLUME: ..
+    PROJECT: $CI_PROJECT_NAMESPACE
   script:
-    - pwd
-    - echo $CI_COMMIT_REF_NAME
-    - echo $CI_COMMIT_TAG
-    - ./build/up ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION test
-    - ./build/install ./build/centos7_$IRODS_VERSION
-    - ./build/run_test ./build/centos7_$IRODS_VERSION
+    - build/gitlab_test.sh
 
-###################################
-# build
-###################################
+# ###############################
+# iRODS 4.1.x
+# ###############################
 centos7_4_1_11_build:
   stage: build
   tags:
     - irods
   variables:
-    IRODS_VERSION: '4_1_11'
-    IRODS_REPO_VERSION: '4.1.11'
+    PROJECT: $CI_PROJECT_NAMESPACE
+    VERSION: centos7_4_1_11
+    VOLUME: ..
   script:
-    - pwd
-    - echo $CI_COMMIT_REF_NAME
-    - echo $CI_COMMIT_TAG
-    - ./build/up ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION
-    - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
-    - |
-      if [ -z "$CI_COMMIT_TAG" ]
-        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --branch $CI_COMMIT_REF_NAME
-      else
-        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --version $CI_COMMIT_TAG
-      fi
+    - build/gitlab_build.sh
+
+centos7_4_1_11_publish:
+  stage: publish
+  tags:
+    - irods
+  variables:
+    PROJECT: $CI_PROJECT_NAMESPACE
+    VERSION: centos7_4_1_11
+    VOLUME: ..
+  script:
+    - build/gitlab_publish.sh
 
 centos7_4_1_12_build:
   stage: build
   tags:
     - irods
   variables:
-    IRODS_VERSION: '4_1_12'
-    IRODS_REPO_VERSION: '4.1.12'
+    PROJECT: $CI_PROJECT_NAMESPACE
+    VERSION: centos7_4_1_12
+    VOLUME: ..
   script:
-    - pwd
-    - echo $CI_COMMIT_REF_NAME
-    - echo $CI_COMMIT_TAG
-    - ./build/up ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION
-    - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
-    - |
-      if [ -z "$CI_COMMIT_TAG" ]
-        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --branch $CI_COMMIT_REF_NAME
-      else
-        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --version $CI_COMMIT_TAG
-      fi
+    - build/gitlab_build.sh
 
+centos7_4_1_12_publish:
+  stage: publish
+  tags:
+    - irods
+  variables:
+    PROJECT: $CI_PROJECT_NAMESPACE
+    VERSION: centos7_4_1_12
+    VOLUME: ..
+  script:
+    - build/gitlab_publish.sh
+
+# ###############################
+# iRODS 4.2.x
+# ###############################
+
+# ###
 centos7_4_2_3_build:
   stage: build
   tags:
     - irods
   variables:
-    IRODS_VERSION: '4_2_3'
-    IRODS_REPO_VERSION: '4.2.3'
+    PROJECT: $CI_PROJECT_NAMESPACE
+    VERSION: centos7_4_2_3
+    VOLUME: ..
   script:
-    - pwd
-    - echo $CI_COMMIT_REF_NAME
-    - echo $CI_COMMIT_TAG
-    - ./build/up ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION
-    - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
-    - |
-      if [ -z "$CI_COMMIT_TAG" ]
-        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --branch $CI_COMMIT_REF_NAME
-      else
-        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --version $CI_COMMIT_TAG
-      fi
+    - build/gitlab_build.sh
 
+centos7_4_2_3_publish:
+  stage: publish
+  tags:
+    - irods
+  variables:
+    PROJECT: $CI_PROJECT_NAMESPACE
+    VERSION: centos7_4_2_3
+    VOLUME: ..
+  script:
+    - build/gitlab_publish.sh
+
+# ###
 centos7_4_2_4_build:
   stage: build
   tags:
     - irods
   variables:
-    IRODS_VERSION: '4_2_4'
-    IRODS_REPO_VERSION: '4.2.4'
+    PROJECT: $CI_PROJECT_NAMESPACE
+    VERSION: centos7_4_2_4
+    VOLUME: ..
   script:
-    - pwd
-    - echo $CI_COMMIT_REF_NAME
-    - echo $CI_COMMIT_TAG
-    - ./build/up ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION
-    - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
-    - |
-      if [ -z "$CI_COMMIT_TAG" ]
-        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --branch $CI_COMMIT_REF_NAME
-      else
-        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --version $CI_COMMIT_TAG
-      fi
+    - build/gitlab_build.sh
 
+centos7_4_2_4_publish:
+  stage: publish
+  tags:
+    - irods
+  variables:
+    PROJECT: $CI_PROJECT_NAMESPACE
+    VERSION: centos7_4_2_4
+    VOLUME: ..
+  script:
+    - build/gitlab_publish.sh
+
+# ###
 centos7_4_2_5_build:
   stage: build
   tags:
     - irods
   variables:
-    IRODS_VERSION: '4_2_5'
-    IRODS_REPO_VERSION: '4.2.5'
+    PROJECT: $CI_PROJECT_NAMESPACE
+    VERSION: centos7_4_2_5
+    VOLUME: ..
   script:
-    - pwd
-    - echo $CI_COMMIT_REF_NAME
-    - echo $CI_COMMIT_TAG
-    - ./build/up ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION
-    - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
-    - |
-      if [ -z "$CI_COMMIT_TAG" ]
-        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --branch $CI_COMMIT_REF_NAME
-      else
-        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --version $CI_COMMIT_TAG
-      fi
+    - build/gitlab_build.sh
 
+centos7_4_2_5_publish:
+  stage: publish
+  tags:
+    - irods
+  variables:
+    PROJECT: $CI_PROJECT_NAMESPACE
+    VERSION: centos7_4_2_5
+    VOLUME: ..
+  script:
+    - build/gitlab_publish.sh
+
+# ###
 centos7_4_2_6_build:
   stage: build
   tags:
     - irods
   variables:
-    IRODS_VERSION: '4_2_6'
-    IRODS_REPO_VERSION: '4.2.6'
+    PROJECT: $CI_PROJECT_NAMESPACE
+    VERSION: centos7_4_2_6
+    VOLUME: ..
   script:
-    - pwd
-    - echo $CI_COMMIT_REF_NAME
-    - echo $CI_COMMIT_TAG
-    - ./build/up ./build/centos7_$IRODS_VERSION
-    - ./build/make ./build/centos7_$IRODS_VERSION
-    - ./build/make_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
-    - ./build/copy_rpm --irods-version $IRODS_REPO_VERSION --branch $CI_COMMIT_REF_NAME
-    - |
-      if [ -z "$CI_COMMIT_TAG" ]
-        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --branch $CI_COMMIT_REF_NAME
-      else
-        ./copy_rpm --irods-version $IRODS_REPO_VERSION --project $CI_PROJECT_NAMESPACE --version $CI_COMMIT_TAG
-      fi
+    - build/gitlab_build.sh
 
+centos7_4_2_6_publish:
+  stage: publish
+  tags:
+    - irods
+  variables:
+    PROJECT: $CI_PROJECT_NAMESPACE
+    VERSION: centos7_4_2_6
+    VOLUME: ..
+  script:
+    - build/gitlab_publish.sh
+
+# ###
+centos7_4_2_7_build:
+  stage: build
+  tags:
+    - irods
+  variables:
+    PROJECT: $CI_PROJECT_NAMESPACE
+    VERSION: centos7_4_2_7
+    VOLUME: ..
+  script:
+    - build/gitlab_build.sh
+
+centos7_4_2_7_publish:
+  stage: publish
+  tags:
+    - irods
+  variables:
+    PROJECT: $CI_PROJECT_NAMESPACE
+    VERSION: centos7_4_2_7
+    VOLUME: ..
+  script:
+    - build/gitlab_publish.sh
