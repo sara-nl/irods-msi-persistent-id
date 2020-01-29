@@ -9,12 +9,12 @@ k
 12345678901234567890123456789012
 
 rods
-test
+__RODS_PASSWORD__
 yes
 postgres
 5432
 ICAT
 irods
-test
+__IRODS_DB_PASSWORD__
 yes
 

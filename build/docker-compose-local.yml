@@ -1,0 +1,47 @@
+version: '2'
+
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
+    ports:
+      - "5432"
+    hostname: postgres.irods
+
+  handle:
+    build:
+      context: .
+      dockerfile: Dockerfile.handle_mock
+    ports:
+      - "5000"
+    hostname: handle.irods
+
+  icat:
+    build:
+      context: .
+      dockerfile: Dockerfile.${VERSION}
+    ports:
+      - "127.0.0.1:1247:1247"
+    depends_on:
+      - postgres
+      - handle
+    links:
+      - postgres:postgres
+      - handle:handle.irods
+    hostname: icat.irods
+    volumes:
+      - "${VOLUME}:/build"
+    command: /app/sleep.sh
+
+  icommands:
+    build:
+      context: .
+      dockerfile: Dockerfile.icommands
+    volumes:
+      - "${VOLUME}:/build"
+    depends_on:
+      - icat
+    links:
+      - icat:icat.irods
+    command: /app/sleep.sh

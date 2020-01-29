@@ -1,0 +1,48 @@
+FROM centos:7
+ARG AYUB_PASSWORD=ayub
+ARG MARA_PASSWORD=mara
+
+RUN yum update -y && \
+    yum install -y \
+    wget telnet emacs yum-utils python3-pip git openssl
+
+RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
+    rpm --import https://packages.irods.org/irods-signing-key.asc && \
+    wget -qO - https://packages.irods.org/renci-irods.yum.repo | \
+    tee /etc/yum.repos.d/renci-irods.yum.repo
+
+RUN yum install -y irods-icommands-4.2.6 && \
+    pip3 install python-irodsclient
+
+# PHP
+RUN yum install -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm && \
+    yum-config-manager --enable remi-php73 && \
+    yum install -y \
+        php php-mcrypt php-cli php-gd php-curl php-mysql php-ldap php-zip \
+        php-fileinfo php-dom
+
+ADD app/sleep.sh /app/sleep.sh
+ADD app/wait_for_irods.sh /app/wait_for_irods.sh
+
+RUN useradd -r -M -d /home/mara -s /bin/bash mara && \
+    mkdir -p /home/mara
+
+RUN useradd -r -M -d /home/ayub -s /bin/bash ayub && \
+    mkdir -p /home/ayub
+
+ADD app/irods_environment_ayub.json /home/ayub/.irods/irods_environment.json
+ADD app/bashrc /home/ayub/.bashrc
+ADD app/irods_environment_mara.json /home/mara/.irods/irods_environment.json
+ADD app/bashrc /home/mara/.bashrc
+ADD app/iinit.py /app/iinit.py
+
+RUN chown mara:mara -R /home/mara
+RUN chown ayub:ayub -R /home/ayub
+
+USER ayub
+RUN python3 /app/iinit.py
+
+USER mara
+RUN python3 /app/iinit.py
+
+CMD ["/app/sleep.sh"]

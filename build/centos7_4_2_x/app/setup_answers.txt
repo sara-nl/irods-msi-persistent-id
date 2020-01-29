@@ -7,7 +7,7 @@ postgres
 ICAT
 irods
 yes
-test
+__IRODS_DB_PASSWORD__
 
 tempZone
 1247
@@ -20,5 +20,5 @@ yes
 k
 12345678901234567890123456789012
 12345678901234567890123456789012
-test
+__RODS_PASSWORD__
 /var/lib/irods/iRODS/Vault

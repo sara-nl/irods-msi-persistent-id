@@ -274,101 +274,41 @@ Requirements to build, test and package the microservices:
 
 
 ### Directions
-#### 1. Build the required docker images
+
+#### 1. Choose version to build
 
 ``` bash
-cd build/centos7_4_1_11
-docker-compose build
-cd -
-
-cd build/centos7_4_1_12
-docker-compose build
-cd -
-
-cd build/centos7_4_2_3
-docker-compose build
-cd -
-
-cd build/centos7_4_2_4
-docker-compose build
-cd -
-
-cd build/centos7_4_2_5
-docker-compose build
-cd -
-
-cd build/centos7_4_2_6
-docker-compose build
-cd -
-
+VERSION=centos7_4_2_6
 ```
 
-#### 2. Test the required containers
+#### 2. Build the required docker images
 
 ``` bash
-./build/up ./build/centos7_4_1_11
-./build/down ./build/centos7_4_1_11
-
-./build/up ./build/centos7_4_1_12
-./build/down ./build/centos7_4_1_12
-
-./build/up ./build/centos7_4_2_3
-./build/down ./build/centos7_4_2_3
-
-./build/up ./build/centos7_4_2_4
-./build/down ./build/centos7_4_2_4
-
-./build/up ./build/centos7_4_2_5
-./build/down ./build/centos7_4_2_5
-
-./build/up ./build/centos7_4_2_6
-./build/down ./build/centos7_4_2_6
+cd build
+./local_build_containers.sh $VERSION
+cd ..
 ```
 
-#### 3. Building the iRODS micorservices and perform unit tests
+#### 3. Test the required containers
 
 ``` bash
-./build/up ./build/centos7_4_1_11
-./build/make ./build/centos7_4_1_11
-./build/make ./build/centos7_4_1_11 test
+cd build
+./local_run_test.sh $VERSION
+cd ..
+```
+
+#### 4. Creating RPMs
+
+``` bash
+cd build
+PACK_VERSION=1.0.1
+docker-compose -f build/docker-compose-local.yml run icat sudo -u rpmbuild \
+                   /home/rpmbuild/build_rpm.sh \
+                   --spec-file /build/msi-persistent-id.spec \
+                   --package msi-persistent-id \
+                   --version $PACK_VERSION
+docker cp build_icat_run_1:/home/rpmbuild/rpmbuild/RPMS/x86_64 .
+cd ..
 ```
 and likewise for the other versions
-
-#### 4. Installing the binaries into the test container and perform functional tests
-
-``` bash
-./build/install ./build/centos7_4_1_11
-./build/run_test ./build/centos7_4_1_11
-```
-
-#### 5.  Create RPM
-
-Create a RPM for the current branch
-``` bash
-./build/make_rpm --irods-version 4.1.11
-```
-or configure it manually
-``` bash
-./build/make_rpm --irods-version 4.1.11 --branch master
-```
-
-Note the version is automatically determined:
-* if the current git HEAD is a tag in the form _vX.Y.Z_, the version of the PDF is 
-  generated as X.Y.Z
-* otherwise the verions is determined as _X.Y_, where _X_ is the current branch (e.g. _master_) and 
-  _Y_ is the unix timestamp of the last commit.
-
-The version number of the RPM can also be overwritten
-``` bash
-./build/make_rpm --irods-version 4.1.11 --version 1.2.0
-```
-
-The RPMs are written to the directory RPMS/
-
-
-#### 6. Make clean
-
-``` bash
-./build/make ./build/centos7_4_1_11 clean
-```
 

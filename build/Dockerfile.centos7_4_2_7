@@ -1,0 +1,126 @@
+FROM centos:7
+
+RUN yum update -y && \
+    yum install -y \
+    rsync wget less emacs make cmake gcc gcc-c++ help2man pam-devel unixODBC-devel
+
+RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
+    rpm --import https://packages.irods.org/irods-signing-key.asc && \
+    wget -qO - https://packages.irods.org/renci-irods.yum.repo | \
+    tee /etc/yum.repos.d/renci-irods.yum.repo && \
+    wget -qO - https://core-dev.irods.org/renci-irods-core-dev.yum.repo | \
+    tee /etc/yum.repos.d/renci-irods-core-dev.yum.repo
+
+RUN yum install -y \
+    sudo \
+    which \
+    python3 \
+    python-jsonschema \
+    python-psutil \
+    python-requests \
+    python3-requests \
+    python-pip \
+    python3-pip \
+    python-behave \
+    python-devel  \
+    python3-devel  \
+    openssl-devel \
+    fuse-libs \
+    lsof \
+    openssl \
+    perl-JSON \
+    authd \
+    postgresql \
+    postgresql-odbc\
+    boost-devel \
+    libcurl-devel \
+    rpm-build \
+    rpm-devel \
+    rpmlint \
+    rpmdevtools \
+    coreutils \
+    diffutils \
+    git \
+    pam-devel \
+    unixODBC-devel \
+    unixODBC \
+    postgresql-odbc \
+    patch \
+    'irods-externals*' && \
+    yum clean all
+
+# Python
+RUN pip install python-irodsclient flask flask_restful s3cmd && \
+    pip3 install python-irodsclient flask flask_restful s3cmd pytest
+
+# Openstack
+RUN yum install -y centos-release-openstack-rocky \
+    python-swiftclient \
+    python3-keystoneclient \
+    python-openstackclient
+
+# Catch
+RUN cd /opt/ && \
+    wget  https://github.com/catchorg/Catch2/archive/v2.9.2.tar.gz && \
+    tar -xvf v2.9.2.tar.gz
+
+# iRODS setup
+ADD app/irods_environment.json /root/.irods/irods_environment.json
+ADD app/sleep.sh /app/sleep.sh
+ADD app/wait_for_pg.sh /app/wait_for_pg.sh
+ADD app/setup_service_user.sh /app/setup_service_user.sh
+ADD app/init_users.sh /app/init_users.sh
+ADD app/wait_for_irods.sh /app/wait_for_irods.sh
+
+# user ayub
+RUN useradd -r -M -d /home/ayub -s /bin/bash ayub && \
+    mkdir -p /home/ayub
+ADD app/irods_environment_ayub.json /home/ayub/.irods/irods_environment.json
+RUN chown ayub:ayub -R /home/ayub
+
+# user mara
+RUN useradd -r -M -d /home/mara -s /bin/bash mara && \
+    mkdir -p /home/mara
+ADD app/irods_environment_mara.json /home/mara/.irods/irods_environment.json
+RUN chown mara:mara -R /home/mara
+
+# user rpmbuild
+RUN useradd -r -M -d /home/rpmbuild -s /bin/bash rpmbuild && \
+    mkdir -p /home/rpmbuild
+ADD app/build_rpm.sh /home/rpmbuild/build_rpm.sh
+RUN chown rpmbuild -R /home/rpmbuild && \
+    sudo -u rpmbuild rpmdev-setuptree
+
+################################################################################
+#
+# irods
+#
+################################################################################
+RUN yum install -y irods-devel \
+                   irods-server-4.2.7 \
+                   irods-database-plugin-postgres-4.2.7 \
+                   irods-icommands%VERSION-4.2.7 \
+                   irods-rule-engine-plugin-audit-amqp-4.2.7 \
+                   irods-rule-engine-plugin-python-4.2.7 \
+                   irods-runtime-4.2.7 \
+                   irods-server-4.2.7 && \
+    yum clean all
+
+COPY app/odbcinst.ini /etc/odbcinst.ini
+
+################################################################################
+#
+# irods setup preparation
+#
+################################################################################
+ADD centos7_4_2_x/app/setup_answers.txt /app/setup_answers.txt
+ADD centos7_4_2_x/app/setup_irods.sh /app/setup_irods.sh
+ADD centos7_4_2_x/app/restart_irods.sh /app/restart_irods.sh
+
+RUN groupadd -r irods
+RUN useradd -r -d /var/lib/irods -M -s /bin/bash -g irods -c 'iRODS Administrator' -p '!' irods
+
+ADD centos7_4_2_x/config.mk /opt/config.mk
+
+ENTRYPOINT [ "/app/setup_irods.sh" ]
+CMD [ "/app/sleep.sh" ]

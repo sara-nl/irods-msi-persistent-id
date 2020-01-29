@@ -1,15 +1,16 @@
 #!/bin/bash
 
 RETRIES=10
-PG_HOST=postgres
-PG_USER=irods
-PG_DATABASE=ICAT
+_PG_HOST=${PG_HOST:-postgres}
+_PG_USER=${PG_USER:-irods}
+_PG_DATABASE=${PG_DATABASE:-ICAT}
+_IRODS_DB_PASSWORD=${IRODS_DB_PASSWORD:-irods}
 
 err=1
 while [ $err != 0 ]
 do
     echo "attempt to connect to database"
-    PGPASSWORD=test psql --user $PG_USER --host=$PG_HOST --command='\q' $PG_DATABASE
+    PGPASSWORD=$_IRODS_DB_PASSWORD psql --user $_PG_USER --host=$_PG_HOST --command='\q' $_PG_DATABASE
     err=$?
     RETRIES=$(( RETRIES - 1 ))
     if [ $err != 0 ];
@@ -20,8 +21,8 @@ do
             exit 8
         fi
         echo "failed: try again ($attempts attempts)"
-        sleep 2;
     fi
+    sleep 5;
 done
 
 

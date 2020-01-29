@@ -1,8 +1,9 @@
 FROM ubuntu:16.04
 
+RUN apt-get update
+
 # basic system
-RUN apt-get update &&\
-    apt-get install -y \
+RUN apt-get install -y \
     lsb-release \
     sudo \
     wget \
@@ -12,8 +13,8 @@ RUN apt-get update &&\
     dnsutils \
     python-software-properties software-properties-common \
     postgresql postgresql-client postgresql-contrib \
-    odbc-postgresql \
-    emacs
+    odbc-postgresql && \
+    apt-get clean
 
 # postgres
 RUN echo "host all  all    0.0.0.0/0  md5" >> /etc/postgresql/9.5/main/pg_hba.conf && \
@@ -22,9 +23,11 @@ USER postgres
 RUN /etc/init.d/postgresql start &&\
     psql --command "CREATE USER docker WITH SUPERUSER PASSWORD 'docker';" &&\
     createdb -O docker docker &&\
-    psql --command "CREATE USER irods WITH PASSWORD 'test';" &&\
+    psql --command "CREATE USER irods WITH PASSWORD 'irods';" &&\
     psql --command 'CREATE DATABASE "ICAT";' &&\
-    psql --command 'GRANT ALL PRIVILEGES ON DATABASE "ICAT" TO irods;'
+    psql --command 'GRANT ALL PRIVILEGES ON DATABASE "ICAT" TO irods;' &&\
+    /etc/init.d/postgresql stop
+    
 USER root
 RUN mkdir /app
 RUN echo '#!/bin/bash' > /app/run_postgres.sh && \
