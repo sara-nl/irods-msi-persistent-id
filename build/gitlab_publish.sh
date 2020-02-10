@@ -11,7 +11,7 @@ then
     PACK_VERSION=$CI_PIPELINE_ID
 else
     BRANCH="release"
-    PACK_VERSION=$CI_COMMIT_TAG
+    PACK_VERSION=$( echo $CI_COMMIT_TAG | sed 's/^v//g' )
 fi
 
 if [ "$OS_VERSION" = "centos7" ]
