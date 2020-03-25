@@ -9,6 +9,7 @@ stages:
 
 before_script:
   - rm -f .variables
+  - touch .variables
   - |
       if [ "$CI_REGISTRY" = "git.ia.surfsara.nl:5050" ]
       then
