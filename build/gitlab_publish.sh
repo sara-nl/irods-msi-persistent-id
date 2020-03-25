@@ -5,23 +5,32 @@ set -e
 IRODS_VERSION=$( echo $VERSION | sed 's/^[^_]*_//' | sed 's/_/./g' )
 OS_VERSION=$( echo $VERSION | cut -d '_' -f 1 )
 
+if [ -z "$TEST_YUM_REPO" ]
+then
+    TEST_YUM_REPO=DMS-RPM-Testing
+fi
+if [ -z "$PROD_YUM_REPO" ]
+then
+    PROD_YUM_REPO=DMS-RPM-Production
+fi
+
 if [ -z "$CI_COMMIT_TAG" ]
 then
     RELEASE=0
     BRANCH=$CI_COMMIT_REF_NAME
     PACK_VERSION=$CI_PIPELINE_ID
-    REPOS=(DMS-RPM-Testing)
+    REPOS=($TEST_REPO)
 else
     RELEASE=0
     BRANCH="release"
     PACK_VERSION=$( echo $CI_COMMIT_TAG | sed 's/^v//g' )
-    REPOS=(DMS-RPM-Testing DMS-RPM-Production)
+    REPOS=($TEST_YUM_REPO $PROD_YUM_REPO)
 fi
 
 if [ "$OS_VERSION" = "centos7" ]
 then
     TARGET_DIR=/data/RPMS/$CI_PROJECT_NAMESPACE/$BRANCH/CentOS/7/irods-$IRODS_VERSION
-    if [ "$BRANCH" = "release" ] & ( [ "$CI_PROJECT_NAMESPACE" = "data-management-services" ] | [ "$CI_PROJECT_NAMESPACE" = "B2SAFE" ] )
+    if [ "$BRANCH" = "release" ] & [ "$CI_PROJECT_NAMESPACE" = "data-management-services" -o "$CI_PROJECT_NAMESPACE" = "B2SAFE" ]
     then
         REMOTE_TARGET_DIR=Centos/7/irods-$IRODS_VERSION/release/x86_64/Packages
     else
