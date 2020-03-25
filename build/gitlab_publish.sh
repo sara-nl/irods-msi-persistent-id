@@ -7,21 +7,25 @@ OS_VERSION=$( echo $VERSION | cut -d '_' -f 1 )
 
 if [ -z "$CI_COMMIT_TAG" ]
 then
+    RELEASE=0
     BRANCH=$CI_COMMIT_REF_NAME
     PACK_VERSION=$CI_PIPELINE_ID
+    REPOS=(DMS-RPM-Testing)
 else
+    RELEASE=0
     BRANCH="release"
     PACK_VERSION=$( echo $CI_COMMIT_TAG | sed 's/^v//g' )
+    REPOS=(DMS-RPM-Testing DMS-RPM-Production)
 fi
 
 if [ "$OS_VERSION" = "centos7" ]
 then
     TARGET_DIR=/data/RPMS/$CI_PROJECT_NAMESPACE/$BRANCH/CentOS/7/irods-$IRODS_VERSION
-    if [ "$BRANCH" = "release" ] & [ "$CI_PROJECT_NAMESPACE" = "data-management-services" ]
+    if [ "$BRANCH" = "release" ] & ( [ "$CI_PROJECT_NAMESPACE" = "data-management-services" ] | [ "$CI_PROJECT_NAMESPACE" = "B2SAFE" ] )
     then
-        REMOTE_TARGET_DIR=/repos/CentOS/7/irods-$IRODS_VERSION/Packages
+        REMOTE_TARGET_DIR=Centos/7/irods-$IRODS_VERSION/release/x86_64/Packages
     else
-        REMOTE_TARGET_DIR=/repos/CentOS/7/$CI_PROJECT_NAMESPACE/$BRANCH/irods-$IRODS_VERSION/Packages
+        REMOTE_TARGET_DIR=Centos/7/irods-$IRODS_VERSION/$BRANCH/x84_64/Packages
     fi
 else
     echo "invalid os version $OS_VERSION"
@@ -30,6 +34,18 @@ fi
 RPM=${PACKAGE_NAME}-${PACK_VERSION}-1.el7.x86_64.rpm
 
 
-ssh -oStrictHostKeyChecking=no $YUM_SERVER mkdir -p $REMOTE_TARGET_DIR
-scp -oStrictHostKeyChecking=no $TARGET_DIR/x86_64/$RPM $YUM_SERVER:$REMOTE_TARGET_DIR/$RPM
-ssh -oStrictHostKeyChecking=no $YUM_SERVER createrepo --update $REMOTE_TARGET_DIR
+set +x
+ret=0
+for REPO in ${REPOS[@]}; do
+    if [ -z "$ARTIE_KEY" ]
+    then
+        echo "no ARTIE_KEY defined: not published"
+        echo curl -H "X-JFrog-Art-Api:$ARTIE_KEY" -XPUT https://artie.ia.surfsara.nl/artifactory/${REPO}/${REMOTE_TARGET_DIR}/${RPM} -T ${RPM}
+        ret=1
+    else
+        curl -H "X-JFrog-Art-Api:$ARTIE_KEY" -XPUT https://artie.ia.surfsara.nl/artifactory/${REPO}/${REMOTE_TARGET_DIR}/${RPM} -T ${RPM}
+    fi
+done
+
+
+exit $ret
