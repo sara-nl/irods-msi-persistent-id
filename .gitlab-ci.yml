@@ -8,7 +8,18 @@ stages:
   - publish
 
 before_script:
+  - rm -f .variables
+  - |
+      if [ "$CI_REGISTRY" = "git.ia.surfsara.nl:5050" ]
+      then
+        echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin  $CI_REGISTRY;
+        echo "export REGISTRY=$CI_REGISTRY/$CI_PROJECT_NAMESPACE/irods-ci-server" >> .variables
+      else
+        echo $REGISTRY_PASSWORD | docker login -u $REGISTRY_USER --password-stdin  $REGISTRY;
+        echo "export REGISTRY=$REGISTRY" >> .variables
+      fi
   - docker-compose -f build/docker-compose.yml down -v
+
 after_script:
   - docker-compose -f build/docker-compose.yml rm -f
   - docker-compose -f build/docker-compose.yml down -v
