@@ -1,7 +1,6 @@
 #!/bin/bash
 set -x
 set -e
-echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin  $CI_REGISTRY
 
 IRODS_VERSION=$( echo $VERSION | sed 's/^[^_]*_//' | sed 's/_/./g' )
 OS_VERSION=$( echo $VERSION | cut -d '_' -f 1 )
