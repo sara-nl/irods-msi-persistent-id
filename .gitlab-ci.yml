@@ -18,9 +18,11 @@ before_script:
         echo $REGISTRY_PASSWORD | docker login -u $REGISTRY_USER --password-stdin  $REGISTRY;
         echo "export REGISTRY=$REGISTRY" >> .variables
       fi
+  - source .variables
   - docker-compose -f build/docker-compose.yml down -v
 
 after_script:
+  - source .variables
   - docker-compose -f build/docker-compose.yml rm -f
   - docker-compose -f build/docker-compose.yml down -v
 
@@ -36,6 +38,7 @@ centos7_4_1_12_test:
     VOLUME: ..
     PROJECT: $CI_PROJECT_NAMESPACE
   script:
+    - source .variables
     - build/gitlab_test.sh
 
 centos7_4_2_6_test:
@@ -47,6 +50,7 @@ centos7_4_2_6_test:
     VOLUME: ..
     PROJECT: $CI_PROJECT_NAMESPACE
   script:
+    - source .variables
     - build/gitlab_test.sh
 
 # ###############################
@@ -61,6 +65,7 @@ centos7_4_1_11_build:
     VERSION: centos7_4_1_11
     VOLUME: ..
   script:
+    - source .variables
     - build/gitlab_build.sh
 
 centos7_4_1_11_publish:
@@ -72,6 +77,7 @@ centos7_4_1_11_publish:
     VERSION: centos7_4_1_11
     VOLUME: ..
   script:
+    - source .variables
     - build/gitlab_publish.sh
 
 centos7_4_1_12_build:
@@ -83,6 +89,7 @@ centos7_4_1_12_build:
     VERSION: centos7_4_1_12
     VOLUME: ..
   script:
+    - source .variables
     - build/gitlab_build.sh
 
 centos7_4_1_12_publish:
@@ -94,6 +101,7 @@ centos7_4_1_12_publish:
     VERSION: centos7_4_1_12
     VOLUME: ..
   script:
+    - source .variables
     - build/gitlab_publish.sh
 
 # ###############################
@@ -110,6 +118,7 @@ centos7_4_2_3_build:
     VERSION: centos7_4_2_3
     VOLUME: ..
   script:
+    - source .variables
     - build/gitlab_build.sh
 
 centos7_4_2_3_publish:
@@ -121,6 +130,7 @@ centos7_4_2_3_publish:
     VERSION: centos7_4_2_3
     VOLUME: ..
   script:
+    - source .variables
     - build/gitlab_publish.sh
 
 # ###
@@ -133,6 +143,7 @@ centos7_4_2_4_build:
     VERSION: centos7_4_2_4
     VOLUME: ..
   script:
+    - source .variables
     - build/gitlab_build.sh
 
 centos7_4_2_4_publish:
@@ -144,6 +155,7 @@ centos7_4_2_4_publish:
     VERSION: centos7_4_2_4
     VOLUME: ..
   script:
+    - source .variables
     - build/gitlab_publish.sh
 
 # ###
@@ -156,6 +168,7 @@ centos7_4_2_5_build:
     VERSION: centos7_4_2_5
     VOLUME: ..
   script:
+    - source .variables
     - build/gitlab_build.sh
 
 centos7_4_2_5_publish:
@@ -167,6 +180,7 @@ centos7_4_2_5_publish:
     VERSION: centos7_4_2_5
     VOLUME: ..
   script:
+    - source .variables
     - build/gitlab_publish.sh
 
 # ###
@@ -179,6 +193,7 @@ centos7_4_2_6_build:
     VERSION: centos7_4_2_6
     VOLUME: ..
   script:
+    - source .variables
     - build/gitlab_build.sh
 
 centos7_4_2_6_publish:
@@ -190,6 +205,7 @@ centos7_4_2_6_publish:
     VERSION: centos7_4_2_6
     VOLUME: ..
   script:
+    - source .variables
     - build/gitlab_publish.sh
 
 # ###
@@ -202,6 +218,7 @@ centos7_4_2_7_build:
     VERSION: centos7_4_2_7
     VOLUME: ..
   script:
+    - source .variables
     - build/gitlab_build.sh
 
 centos7_4_2_7_publish:
@@ -213,4 +230,5 @@ centos7_4_2_7_publish:
     VERSION: centos7_4_2_7
     VOLUME: ..
   script:
+    - source .variables
     - build/gitlab_publish.sh
