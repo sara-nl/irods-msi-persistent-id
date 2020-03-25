@@ -81,155 +81,155 @@ centos7_4_1_11_publish:
     - source .variables
     - build/gitlab_publish.sh
 
-centos7_4_1_12_build:
-  stage: build
-  tags:
-    - irods
-  variables:
-    PROJECT: $CI_PROJECT_NAMESPACE
-    VERSION: centos7_4_1_12
-    VOLUME: ..
-  script:
-    - source .variables
-    - build/gitlab_build.sh
+# centos7_4_1_12_build:
+#   stage: build
+#   tags:
+#     - irods
+#   variables:
+#     PROJECT: $CI_PROJECT_NAMESPACE
+#     VERSION: centos7_4_1_12
+#     VOLUME: ..
+#   script:
+#     - source .variables
+#     - build/gitlab_build.sh
 
-centos7_4_1_12_publish:
-  stage: publish
-  tags:
-    - irods
-  variables:
-    PROJECT: $CI_PROJECT_NAMESPACE
-    VERSION: centos7_4_1_12
-    VOLUME: ..
-  script:
-    - source .variables
-    - build/gitlab_publish.sh
+# centos7_4_1_12_publish:
+#   stage: publish
+#   tags:
+#     - irods
+#   variables:
+#     PROJECT: $CI_PROJECT_NAMESPACE
+#     VERSION: centos7_4_1_12
+#     VOLUME: ..
+#   script:
+#     - source .variables
+#     - build/gitlab_publish.sh
 
-# ###############################
-# iRODS 4.2.x
-# ###############################
+# # ###############################
+# # iRODS 4.2.x
+# # ###############################
 
-# ###
-centos7_4_2_3_build:
-  stage: build
-  tags:
-    - irods
-  variables:
-    PROJECT: $CI_PROJECT_NAMESPACE
-    VERSION: centos7_4_2_3
-    VOLUME: ..
-  script:
-    - source .variables
-    - build/gitlab_build.sh
+# # ###
+# centos7_4_2_3_build:
+#   stage: build
+#   tags:
+#     - irods
+#   variables:
+#     PROJECT: $CI_PROJECT_NAMESPACE
+#     VERSION: centos7_4_2_3
+#     VOLUME: ..
+#   script:
+#     - source .variables
+#     - build/gitlab_build.sh
 
-centos7_4_2_3_publish:
-  stage: publish
-  tags:
-    - irods
-  variables:
-    PROJECT: $CI_PROJECT_NAMESPACE
-    VERSION: centos7_4_2_3
-    VOLUME: ..
-  script:
-    - source .variables
-    - build/gitlab_publish.sh
+# centos7_4_2_3_publish:
+#   stage: publish
+#   tags:
+#     - irods
+#   variables:
+#     PROJECT: $CI_PROJECT_NAMESPACE
+#     VERSION: centos7_4_2_3
+#     VOLUME: ..
+#   script:
+#     - source .variables
+#     - build/gitlab_publish.sh
 
-# ###
-centos7_4_2_4_build:
-  stage: build
-  tags:
-    - irods
-  variables:
-    PROJECT: $CI_PROJECT_NAMESPACE
-    VERSION: centos7_4_2_4
-    VOLUME: ..
-  script:
-    - source .variables
-    - build/gitlab_build.sh
+# # ###
+# centos7_4_2_4_build:
+#   stage: build
+#   tags:
+#     - irods
+#   variables:
+#     PROJECT: $CI_PROJECT_NAMESPACE
+#     VERSION: centos7_4_2_4
+#     VOLUME: ..
+#   script:
+#     - source .variables
+#     - build/gitlab_build.sh
 
-centos7_4_2_4_publish:
-  stage: publish
-  tags:
-    - irods
-  variables:
-    PROJECT: $CI_PROJECT_NAMESPACE
-    VERSION: centos7_4_2_4
-    VOLUME: ..
-  script:
-    - source .variables
-    - build/gitlab_publish.sh
+# centos7_4_2_4_publish:
+#   stage: publish
+#   tags:
+#     - irods
+#   variables:
+#     PROJECT: $CI_PROJECT_NAMESPACE
+#     VERSION: centos7_4_2_4
+#     VOLUME: ..
+#   script:
+#     - source .variables
+#     - build/gitlab_publish.sh
 
-# ###
-centos7_4_2_5_build:
-  stage: build
-  tags:
-    - irods
-  variables:
-    PROJECT: $CI_PROJECT_NAMESPACE
-    VERSION: centos7_4_2_5
-    VOLUME: ..
-  script:
-    - source .variables
-    - build/gitlab_build.sh
+# # ###
+# centos7_4_2_5_build:
+#   stage: build
+#   tags:
+#     - irods
+#   variables:
+#     PROJECT: $CI_PROJECT_NAMESPACE
+#     VERSION: centos7_4_2_5
+#     VOLUME: ..
+#   script:
+#     - source .variables
+#     - build/gitlab_build.sh
 
-centos7_4_2_5_publish:
-  stage: publish
-  tags:
-    - irods
-  variables:
-    PROJECT: $CI_PROJECT_NAMESPACE
-    VERSION: centos7_4_2_5
-    VOLUME: ..
-  script:
-    - source .variables
-    - build/gitlab_publish.sh
+# centos7_4_2_5_publish:
+#   stage: publish
+#   tags:
+#     - irods
+#   variables:
+#     PROJECT: $CI_PROJECT_NAMESPACE
+#     VERSION: centos7_4_2_5
+#     VOLUME: ..
+#   script:
+#     - source .variables
+#     - build/gitlab_publish.sh
 
-# ###
-centos7_4_2_6_build:
-  stage: build
-  tags:
-    - irods
-  variables:
-    PROJECT: $CI_PROJECT_NAMESPACE
-    VERSION: centos7_4_2_6
-    VOLUME: ..
-  script:
-    - source .variables
-    - build/gitlab_build.sh
+# # ###
+# centos7_4_2_6_build:
+#   stage: build
+#   tags:
+#     - irods
+#   variables:
+#     PROJECT: $CI_PROJECT_NAMESPACE
+#     VERSION: centos7_4_2_6
+#     VOLUME: ..
+#   script:
+#     - source .variables
+#     - build/gitlab_build.sh
 
-centos7_4_2_6_publish:
-  stage: publish
-  tags:
-    - irods
-  variables:
-    PROJECT: $CI_PROJECT_NAMESPACE
-    VERSION: centos7_4_2_6
-    VOLUME: ..
-  script:
-    - source .variables
-    - build/gitlab_publish.sh
+# centos7_4_2_6_publish:
+#   stage: publish
+#   tags:
+#     - irods
+#   variables:
+#     PROJECT: $CI_PROJECT_NAMESPACE
+#     VERSION: centos7_4_2_6
+#     VOLUME: ..
+#   script:
+#     - source .variables
+#     - build/gitlab_publish.sh
 
-# ###
-centos7_4_2_7_build:
-  stage: build
-  tags:
-    - irods
-  variables:
-    PROJECT: $CI_PROJECT_NAMESPACE
-    VERSION: centos7_4_2_7
-    VOLUME: ..
-  script:
-    - source .variables
-    - build/gitlab_build.sh
+# # ###
+# centos7_4_2_7_build:
+#   stage: build
+#   tags:
+#     - irods
+#   variables:
+#     PROJECT: $CI_PROJECT_NAMESPACE
+#     VERSION: centos7_4_2_7
+#     VOLUME: ..
+#   script:
+#     - source .variables
+#     - build/gitlab_build.sh
 
-centos7_4_2_7_publish:
-  stage: publish
-  tags:
-    - irods
-  variables:
-    PROJECT: $CI_PROJECT_NAMESPACE
-    VERSION: centos7_4_2_7
-    VOLUME: ..
-  script:
-    - source .variables
-    - build/gitlab_publish.sh
+# centos7_4_2_7_publish:
+#   stage: publish
+#   tags:
+#     - irods
+#   variables:
+#     PROJECT: $CI_PROJECT_NAMESPACE
+#     VERSION: centos7_4_2_7
+#     VOLUME: ..
+#   script:
+#     - source .variables
+#     - build/gitlab_publish.sh
