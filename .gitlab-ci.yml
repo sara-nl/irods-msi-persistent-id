@@ -1,4 +1,5 @@
 variables:
+  GIT_STRATEGY: clone
   GIT_SUBMODULE_STRATEGY: recursive
   YUM_SERVER: software@software.irodspoc-sara.surf-hosted.nl
   PACKAGE_NAME: msi-persistent-id
