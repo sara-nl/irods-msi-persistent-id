@@ -30,7 +30,7 @@ fi
 if [ "$OS_VERSION" = "centos7" ]
 then
     TARGET_DIR=/data/RPMS/$CI_PROJECT_NAMESPACE/$BRANCH/CentOS/7/irods-$IRODS_VERSION/x86_64
-    if [ "$BRANCH" = "release" ] & [ "$CI_PROJECT_NAMESPACE" = "data-management-services" -o "$CI_PROJECT_NAMESPACE" = "b2safe" ]
+    if [ "$BRANCH" = "release" ] && [ "$CI_PROJECT_NAMESPACE" = "data-management-services" -o "$CI_PROJECT_NAMESPACE" = "b2safe" ]
     then
         REMOTE_TARGET_DIR=Centos/7/irods-$IRODS_VERSION/release/x86_64/Packages
     else
