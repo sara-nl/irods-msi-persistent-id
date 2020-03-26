@@ -46,6 +46,10 @@ RPM=${PACKAGE_NAME}-${PACK_VERSION}-1.el7.x86_64.rpm
 set +x
 ret=0
 for REPO in ${REPOS[@]}; do
+    echo $REPO
+done
+
+for REPO in ${REPOS[@]}; do
     if [ -z "$ARTIE_KEY" ]
     then
         echo "no ARTIE_KEY defined: not published"
