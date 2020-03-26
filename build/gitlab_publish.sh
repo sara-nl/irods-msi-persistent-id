@@ -45,18 +45,15 @@ RPM=${PACKAGE_NAME}-${PACK_VERSION}-1.el7.x86_64.rpm
 
 set +x
 ret=0
-for REPO in ${REPOS[@]}; do
-    echo $REPO
-done
 
 for REPO in ${REPOS[@]}; do
     if [ -z "$ARTIE_KEY" ]
     then
         echo "no ARTIE_KEY defined: not published"
-        echo curl -H "X-JFrog-Art-Api:$ARTIE_KEY" -XPUT https://artie.ia.surfsara.nl/artifactory/${REPO}/${REMOTE_TARGET_DIR}/${RPM} -T ${RPM}
+        echo curl -H "X-JFrog-Art-Api:$ARTIE_KEY" -XPUT https://artie.ia.surfsara.nl/artifactory/${REPO}/${REMOTE_TARGET_DIR}/${RPM} -T $TARGET_DIR/${RPM}
         ret=1
     else
-        curl -H "X-JFrog-Art-Api:$ARTIE_KEY" -XPUT https://artie.ia.surfsara.nl/artifactory/${REPO}/${REMOTE_TARGET_DIR}/${RPM} -T ${RPM}
+        curl -H "X-JFrog-Art-Api:$ARTIE_KEY" -XPUT https://artie.ia.surfsara.nl/artifactory/${REPO}/${REMOTE_TARGET_DIR}/${RPM} -T $TARGET_DIR/${RPM}
     fi
 done
 
