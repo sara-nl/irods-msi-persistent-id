@@ -10,7 +10,7 @@ else
     export VERSION=$1
 fi
 
-
+docker-compose -f docker-compose-local.yml build
 docker-compose -f docker-compose-local.yml up
 
 err=$?

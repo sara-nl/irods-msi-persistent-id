@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from flask import Flask, request
-from werkzeug import ImmutableMultiDict
 from flask_restful import Resource, Api
 from pprint import pprint
 import argparse
@@ -31,7 +30,7 @@ class HandleData(object):
         if prefix not in self.handles:
             self.handles[prefix] = {}
 
-    def get_handle(self, prefix, suffix, args=ImmutableMultiDict()):
+    def get_handle(self, prefix, suffix, args={}):
         if self.verbose:
             print("HandleData.get_handle(%s/%s)" % (prefix, suffix))
             pprint(args)
@@ -55,7 +54,7 @@ class HandleData(object):
                     HTTP_400_BAD_REQUEST)
 
     def put_handle(self, prefix, suffix,
-                   args=ImmutableMultiDict(), json_data={}):
+                   args={}, json_data={}):
         if self.verbose:
             print("HandleData.put_handle(%s/%s)" % (prefix, suffix))
             pprint(args)
@@ -89,7 +88,7 @@ class HandleData(object):
                      "java.lang.Exception: Invalid JSON in PUT request"},
                     HTTP_400_BAD_REQUEST)
 
-    def delete(self, prefix, suffix, args=ImmutableMultiDict()):
+    def delete(self, prefix, suffix, args={}):
         if self.verbose:
             print("HandleData.delete(%s/%s)" % (prefix, suffix))
             pprint(args)
