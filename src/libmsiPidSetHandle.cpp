@@ -37,7 +37,7 @@ extern "C"
                               const std::vector<std::pair<std::string, std::string>> & kvp) {
                              return client->setHandle(handle, kvp);
                            },
-                           _inHandle, _inKey, _inValue, nullptr, rei);
+                           _inHandle, _inKey, _inValue, nullptr, rei, false);
   }
 
   irods::ms_table_entry* plugin_factory()

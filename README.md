@@ -76,6 +76,14 @@ Permissions are checked in the following order:
 * check if permission is granted to everybody
 * check if permission is granted to user
 * check if permission is granted to groups
+* check if current user has write resp. read permission on the underlying iRODS object / collection
+  Only valid for iRODS path based Microservices:
+   * msiPidCreate
+   * msiPidDelete
+   * msiPidGet
+   * msiPidMove
+   * msiPidSet
+   * msiPidUnset
 
 Examples:
 1. Everyone can read handles and perform reverse lookup.
@@ -96,6 +104,15 @@ Examples:
 "users_write": [],
 "groups_write": ["handle"]
 ```
+
+4. Every user can get every handle. Only iRODS users can create / modify / delete a handle if 
+   they have the corresponding iRODS permission.
+
+```
+"users_write": ["*owner*"],
+"users_read": ["*"]
+```
+
 
 The permissions settings can be configured in the section "permissions" in the
 main configuration file 

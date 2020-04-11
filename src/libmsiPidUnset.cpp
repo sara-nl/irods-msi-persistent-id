@@ -35,7 +35,7 @@ extern "C"
                                 const std::vector<std::string> & key) {
                                return client->unset(path, key);
                              },
-                             _inPath, _inKey, _outHandle, rei);
+                             _inPath, _inKey, _outHandle, rei, true);
   }
 
   irods::ms_table_entry* plugin_factory()

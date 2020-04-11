@@ -99,7 +99,8 @@ int msiPidCreate(msParam_t* _inPath,
     rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
     return FILE_READ_ERR;
   }
-  if(!checkPermissions(cfg.getCreatePermissions(), rei))
+  char * path = (char*)(_inPath->inOutStruct);
+  if(!checkPermissions(cfg.getCreatePermissions(), rei, path, "write"))
   {
     rodsLog(LOG_ERROR, "user %s#%s is not allowed to create the handle",
             rei->rsComm->clientUser.userName,
@@ -107,7 +108,6 @@ int msiPidCreate(msParam_t* _inPath,
     return MSI_OPERATION_NOT_ALLOWED;
   }
   auto client = cfg.makeIRodsHandleClient();
-  char * path = (char*)(_inPath->inOutStruct);
   try
   {
     auto res = client->create(path, keyValuePairs);

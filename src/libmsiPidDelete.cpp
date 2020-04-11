@@ -68,15 +68,14 @@ int msiPidDelete(msParam_t* _inPath, msParam_t* _outHandle, ruleExecInfo_t* rei)
     rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
     return FILE_READ_ERR;
   }
-  if(!checkPermissions(cfg.getDeletePermissions(), rei))
+  char * path = (char*)(_inPath->inOutStruct);
+  if(!checkPermissions(cfg.getDeletePermissions(), rei, path, "write"))
   {
     rodsLog(LOG_ERROR, "user %s#%s is not allowed to delete the handle",
             rei->rsComm->clientUser.userName,
             rei->rsComm->clientUser.rodsZone);
     return MSI_OPERATION_NOT_ALLOWED;
   }
-
-  char * path = (char*)(_inPath->inOutStruct);
   try
   {
     auto client = cfg.makeIRodsHandleClient();

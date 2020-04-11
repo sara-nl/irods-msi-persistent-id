@@ -44,26 +44,31 @@ using Permissions = surfsara::handle::Permissions;
  * Checks the permission for current user / group against permission object.
  */
 inline bool checkPermissions(std::shared_ptr<Permissions> perm,
-                             ruleExecInfo_t* rei);
+                             ruleExecInfo_t* rei,
+                             const char * path = nullptr,
+                             const std::string & path_based_perm = "read");
 
 inline int msiPidGetAction(GetterFunction getter,
                            msParam_t* _inPath,
                            msParam_t* _inType,
                            msParam_t* _outValue,
-                           ruleExecInfo_t* rei);
+                           ruleExecInfo_t* rei,
+                           bool isRodsPath);
 
 inline int msiPidSetAction(SetterFunction setter,
                            msParam_t* _inStr,
                            msParam_t* _inKey,
                            msParam_t* _inValue,
                            msParam_t* _outHandle,
-                           ruleExecInfo_t* rei);
+                           ruleExecInfo_t* rei,
+                           bool isRodsPath);
 
 inline int msiPidUnsetAction(UnsetterFunction unsetter,
                              msParam_t* _inStr, /* iRODS path or handle */
                              msParam_t* _inKey,
                              msParam_t* _outHandle,
-                             ruleExecInfo_t* rei);
+                             ruleExecInfo_t* rei,
+                             bool isRodsPath);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -142,7 +147,209 @@ static KeyValuePairs parseInputParameters(msParam_t* _inKey, msParam_t* _inValue
 // implmentation
 //
 ////////////////////////////////////////////////////////////////////////////////
-inline bool checkPermissions(std::shared_ptr<Permissions> perm, ruleExecInfo_t* rei)
+inline void addQueryCondition(genQueryInp_t * genQueryInp,
+                              int field,
+                              const char * value)
+{
+  char condstr[MAX_NAME_LEN];
+  snprintf(condstr, MAX_NAME_LEN, "= '%s'", value);
+  addInxVal(&genQueryInp->sqlCondInp, field, condstr);
+}
+
+inline void initQuery(genQueryInp_t * genQueryInp,
+                      const std::vector<int> & fields)
+{
+  memset(genQueryInp, 0, sizeof(genQueryInp_t));
+  genQueryInp->maxRows = MAX_SQL_ROWS;
+  for(auto f : fields)
+  {
+    addInxIval(&genQueryInp->selectInp, f, 1 );
+  }
+}
+
+/////////////////////////////////////
+// get user ids of current users
+// including groups
+/////////////////////////////////////
+inline std::set<int> getUserIds(ruleExecInfo_t* rei)
+{
+  std::set<int> res;
+  genQueryInp_t genQueryInp;
+  genQueryOut_t *genQueryOut = NULL;
+  const char * zone = rei->rsComm->clientUser.rodsZone;
+  const char * user = rei->rsComm->clientUser.userName;
+  initQuery(&genQueryInp, {COL_USER_GROUP_ID});
+  addQueryCondition(&genQueryInp, COL_USER_NAME, user);
+  addQueryCondition(&genQueryInp, COL_USER_ZONE, zone);
+  int status = rsGenQuery( rei->rsComm, &genQueryInp, &genQueryOut );
+  if(genQueryOut && status >= 0)
+  {
+    sqlResult_t *group_coll_id = getSqlResultByInx(genQueryOut, COL_USER_GROUP_ID);
+    for(int j = 0; j < genQueryOut->rowCnt; j++)
+    {
+      res.insert(std::stoi(&group_coll_id->value[group_coll_id->len * j]));
+    }
+  }
+  freeGenQueryOut( &genQueryOut );
+  clearGenQueryInp( &genQueryInp );
+  return res;
+}
+
+inline void getAccess(ruleExecInfo_t* rei,
+                      const std::string & id,
+                      std::set<std::string> & acl,
+                      const std::set<int> & userIds)
+{
+  genQueryInp_t genQueryInp;
+  genQueryOut_t *genQueryOut = NULL;
+  initQuery(&genQueryInp, {COL_DATA_ACCESS_NAME,
+                           COL_DATA_ACCESS_USER_ID});
+  addQueryCondition(&genQueryInp, COL_DATA_ACCESS_DATA_ID, id.c_str());
+  int status = rsGenQuery( rei->rsComm, &genQueryInp, &genQueryOut );
+  if(genQueryOut && status >= 0)
+  {
+    sqlResult_t* group_access_name = getSqlResultByInx(genQueryOut, COL_DATA_ACCESS_NAME);
+    sqlResult_t* group_access_user_id = getSqlResultByInx(genQueryOut, COL_DATA_ACCESS_USER_ID);
+    for(int j = 0; j < genQueryOut->rowCnt; j++)
+    {
+      int userId = std::stoi(&group_access_user_id->value[group_access_user_id->len * j]);
+      if(userIds.find(userId) != userIds.end())
+      {
+        std::string accName(&group_access_name->value[group_access_name->len * j]);
+        if(accName == "modify object") accName = "write";
+        else if(accName == "read object") accName = "read";
+        acl.insert(accName);
+      }
+    }
+  }
+  freeGenQueryOut( &genQueryOut );
+  clearGenQueryInp( &genQueryInp );
+}
+
+inline bool getAclOfCollection(ruleExecInfo_t* rei,
+                               const std::string & _path,
+                               std::set<std::string> & acl,
+                               const std::set<int> & userIds)
+{
+  genQueryInp_t genQueryInp;
+  genQueryOut_t *genQueryOut = NULL;
+  std::string zone(rei->rsComm->clientUser.rodsZone);
+  std::string user(rei->rsComm->clientUser.userName);
+  std::string path(_path);
+  if(path.size() && path.back() == '/')
+  {
+    path.erase(path.size() - 1);
+  }
+  initQuery(&genQueryInp, {COL_COLL_OWNER_NAME,
+                           COL_COLL_OWNER_ZONE,
+                           COL_COLL_ID});
+  addQueryCondition(&genQueryInp, COL_COLL_NAME, path.c_str());
+  int status = rsGenQuery( rei->rsComm, &genQueryInp, &genQueryOut );
+  std::string collId;
+  if(genQueryOut && status >= 0)
+  {
+    sqlResult_t* group_owner_name = getSqlResultByInx(genQueryOut, COL_COLL_OWNER_NAME);
+    sqlResult_t* group_owner_zone = getSqlResultByInx(genQueryOut, COL_COLL_OWNER_ZONE);
+    sqlResult_t* group_id = getSqlResultByInx(genQueryOut, COL_COLL_ID);
+    for(int j = 0; j < genQueryOut->rowCnt; j++)
+    {
+      collId = std::string(&group_id->value[group_id->len * j]);
+      if(user == &group_owner_name->value[group_owner_name->len * j] &&
+         zone == &group_owner_zone->value[group_owner_zone->len * j])
+      {
+        acl.insert("own");
+      }
+    }
+  }
+  freeGenQueryOut( &genQueryOut );
+  clearGenQueryInp( &genQueryInp );
+  if(collId.empty())
+  {
+    return false;
+  }
+  else
+  {
+    getAccess(rei, collId, acl, userIds);
+    return true;
+  }
+}
+
+inline bool getAclOfObject(ruleExecInfo_t* rei,
+                           const std::string & path,
+                           std::set<std::string> & acl,
+                           const std::set<int> & userIds)
+{
+  genQueryInp_t genQueryInp;
+  genQueryOut_t *genQueryOut = NULL;
+  std::string zone(rei->rsComm->clientUser.rodsZone);
+  std::string user(rei->rsComm->clientUser.userName);
+  std::size_t found = path.find_last_of("/\\");
+  std::string collname;
+  std::string filename;
+  if(found != std::string::npos)
+  {
+    collname = path.substr(0, found);
+    filename = path.substr(found + 1);
+  }
+  initQuery(&genQueryInp, {COL_D_OWNER_NAME,
+                           COL_D_OWNER_ZONE,
+                           COL_D_DATA_ID});
+  addQueryCondition(&genQueryInp, COL_DATA_NAME, filename.c_str());
+  addQueryCondition(&genQueryInp, COL_COLL_NAME, collname.c_str());
+  int status = rsGenQuery( rei->rsComm, &genQueryInp, &genQueryOut );
+  std::string objectId;
+  if(genQueryOut && status >= 0)
+  {
+    sqlResult_t* group_owner_name = getSqlResultByInx(genQueryOut, COL_D_OWNER_NAME);
+    sqlResult_t* group_owner_zone = getSqlResultByInx(genQueryOut, COL_D_OWNER_ZONE);
+    sqlResult_t* group_id = getSqlResultByInx(genQueryOut, COL_D_DATA_ID);
+    for(int j = 0; j < genQueryOut->rowCnt; j++)
+    {
+      objectId = std::string(&group_id->value[group_id->len * j]);
+      if(user == &group_owner_name->value[group_owner_name->len * j] &&
+         zone == &group_owner_zone->value[group_owner_zone->len * j])
+      {
+        acl.insert("own");
+      }
+    }
+  }
+  freeGenQueryOut( &genQueryOut );
+  clearGenQueryInp( &genQueryInp );
+  if(objectId.empty())
+  {
+    return false;
+  }
+  else
+  {
+    getAccess(rei, objectId, acl, userIds);
+    return  true;
+  }
+}
+
+inline std::set<std::string> getAclOfPath(ruleExecInfo_t* rei, const char * path)
+{
+  std::set<std::string> acl;
+  std::set<int> userIds(getUserIds(rei));
+  bool ret = ( getAclOfCollection(rei, path, acl, userIds) ||
+               getAclOfObject(rei, path, acl, userIds) );
+  if(ret)
+  {
+    if(acl.find("own") != acl.end() ||
+       acl.find("write") != acl.end())
+    {
+      acl.insert("read");
+    }
+    if(acl.find("own") != acl.end())
+    {
+      acl.insert("write");
+    }
+  }
+  return acl;
+}
+
+inline bool checkPermissions(std::shared_ptr<Permissions> perm, ruleExecInfo_t* rei,
+                             const char * path,
+                             const std::string & path_based_perm)
 {
   if(perm->checkAny())
   {
@@ -193,6 +400,11 @@ inline bool checkPermissions(std::shared_ptr<Permissions> perm, ruleExecInfo_t* 
     }
     freeGenQueryOut( &genQueryOut );
     clearGenQueryInp( &genQueryInp );
+    if(!found && path)
+    {
+      std::set<std::string> acl(getAclOfPath(rei, path));
+      found = (acl.find(path_based_perm) != acl.end());
+    }
     return found;
   }
   else
@@ -204,7 +416,9 @@ inline bool checkPermissions(std::shared_ptr<Permissions> perm, ruleExecInfo_t* 
 inline int msiPidGetAction(GetterFunction getter,
                            msParam_t* _inStr,
                            msParam_t* _inType,
-                           msParam_t* _outValue, ruleExecInfo_t* rei)
+                           msParam_t* _outValue,
+                           ruleExecInfo_t* rei,
+                           bool isRodsPath)
 {
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;
@@ -230,7 +444,8 @@ inline int msiPidGetAction(GetterFunction getter,
     rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
     return FILE_READ_ERR;
   }
-  if(!checkPermissions(cfg.getReadPermissions(), rei))
+  char * pathOrHandle = (char*)(_inStr->inOutStruct);
+  if(!checkPermissions(cfg.getReadPermissions(), rei, (isRodsPath ? pathOrHandle : nullptr), "read"))
   {
     rodsLog(LOG_ERROR, "user %s#%s is not allowed to create the handle",
             rei->rsComm->clientUser.userName,
@@ -240,7 +455,6 @@ inline int msiPidGetAction(GetterFunction getter,
 
   auto client = cfg.makeIRodsHandleClient();
   std::string inType = std::string((char*)(_inType->inOutStruct));
-  char * pathOrHandle = (char*)(_inStr->inOutStruct);
   try
   {
     auto res = getter(client, pathOrHandle);
@@ -280,7 +494,8 @@ inline int msiPidSetAction(SetterFunction setter,
                            msParam_t* _inKey,
                            msParam_t* _inValue,
                            msParam_t* _outHandle,
-                           ruleExecInfo_t* rei)
+                           ruleExecInfo_t* rei,
+                           bool isRodsPath)
 {
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;
@@ -314,15 +529,14 @@ inline int msiPidSetAction(SetterFunction setter,
     rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
     return FILE_READ_ERR;
   }
-  if(!checkPermissions(cfg.getWritePermissions(), rei))
+  char * pathOrHandle = (char*)(_inStr->inOutStruct);
+  if(!checkPermissions(cfg.getWritePermissions(), rei, (isRodsPath ? pathOrHandle : nullptr), "write"))
   {
     rodsLog(LOG_ERROR, "user %s#%s is not allowed to modify handle",
             rei->rsComm->clientUser.userName,
             rei->rsComm->clientUser.rodsZone);
     return MSI_OPERATION_NOT_ALLOWED;
   }
-
-  char * pathOrHandle = (char*)(_inStr->inOutStruct);
   try
   {
     auto client = cfg.makeIRodsHandleClient();
@@ -375,7 +589,8 @@ inline int msiPidUnsetAction(UnsetterFunction unsetter,
                              msParam_t* _inStr, /* iRODS path or handle */
                              msParam_t* _inKey,
                              msParam_t* _outHandle,
-                             ruleExecInfo_t* rei)
+                             ruleExecInfo_t* rei,
+                             bool isRodsPath)
 {
   using Object = surfsara::ast::Object;
   using String = surfsara::ast::String;
@@ -401,16 +616,15 @@ inline int msiPidUnsetAction(UnsetterFunction unsetter,
     rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
     return FILE_READ_ERR;
   }
-  if(!checkPermissions(cfg.getWritePermissions(), rei))
+  char * pathOrHandle = (char*)(_inStr->inOutStruct);
+  char * key = (char*)(_inKey->inOutStruct);
+  if(!checkPermissions(cfg.getWritePermissions(), rei, (isRodsPath ? pathOrHandle : nullptr), "write"))
   {
     rodsLog(LOG_ERROR, "user %s#%s is not allowed to modify handle",
             rei->rsComm->clientUser.userName,
             rei->rsComm->clientUser.rodsZone);
     return MSI_OPERATION_NOT_ALLOWED;
   }
-
-  char * pathOrHandle = (char*)(_inStr->inOutStruct);
-  char * key = (char*)(_inKey->inOutStruct);
   try
   {
     auto client = cfg.makeIRodsHandleClient();

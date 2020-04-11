@@ -34,7 +34,7 @@ extern "C"
                               const std::string & path) {
                              return client->getHandle(path);
                            },
-                           _inPath, _inType, _outValue, rei);
+                           _inPath, _inType, _outValue, rei, false);
   }
 
   irods::ms_table_entry* plugin_factory()

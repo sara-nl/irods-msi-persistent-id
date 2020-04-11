@@ -76,6 +76,7 @@ int msiPidMoveHandle(msParam_t* _inHandle,
     rodsLog(LOG_ERROR, "failed to read PID config file %s:\n%s", IRODS_PID_CONFIG_FILE, ex.what());
     return FILE_READ_ERR;
   }
+  char * pathNew = (char*)(_inPathNew->inOutStruct);
   if(!checkPermissions(cfg.getWritePermissions(), rei))
   {
     rodsLog(LOG_ERROR, "user %s#%s is not allowed to update handle",
@@ -85,7 +86,6 @@ int msiPidMoveHandle(msParam_t* _inHandle,
   }
 
   char * handle = (char*)(_inHandle->inOutStruct);
-  char * pathNew = (char*)(_inPathNew->inOutStruct);
   try
   {
     auto client = cfg.makeIRodsHandleClient();
